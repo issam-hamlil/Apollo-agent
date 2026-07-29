@@ -1,0 +1,156 @@
+{
+  "patterns": [
+    {
+      "id": "java-pojo-to-kotlin-data-class",
+      "name": "POJO / JavaBean to Data Class",
+      "javaPattern": "public class User { private String id; public String getId() { return id; } public void setId(String id) { this.id = id; } }",
+      "kotlinPattern": "data class User(var id: String? = null)",
+      "category": "STRUCTURE",
+      "description": "Replaces verbose Java POJOs containing getters, setters, equals, hashCode, and toString with concise Kotlin data classes."
+    },
+    {
+      "id": "null-check-to-elvis",
+      "name": "Null Check to Safe Call & Elvis Operator",
+      "javaPattern": "if (user != null && user.getName() != null) { return user.getName(); } else { return \"default\"; }",
+      "kotlinPattern": "return user?.name ?: \"default\"",
+      "category": "NULL_SAFETY",
+      "description": "Converts conditional null checks and defensive guards into idiomatic Kotlin safe calls (?.) and Elvis operator (?:)."
+    },
+    {
+      "id": "static-utility-to-top-level-or-object",
+      "name": "Static Utility Class to Object / Top-Level Function",
+      "javaPattern": "public class StringUtils { public static boolean isEmpty(String s) { return s == null || s.trim().isEmpty(); } }",
+      "kotlinPattern": "object StringUtils {\n    fun isEmpty(s: String?): Boolean = s.isNullOrBlank()\n}",
+      "category": "UTILITY",
+      "description": "Transforms Java static utility classes into Kotlin objects or top-level extension functions."
+    },
+    {
+      "id": "string-builder-to-template",
+      "name": "StringBuilder to String Templates",
+      "javaPattern": "new StringBuilder().append(\"Hello \").append(name).append(\"!\").toString()",
+      "kotlinPattern": "\"Hello $name!\"",
+      "category": "SYNTAX",
+      "description": "Replaces imperative StringBuilder concatenations with Kotlin string interpolation templates."
+    },
+    {
+      "id": "for-loop-to-collection-operators",
+      "name": "Imperative Loop to Collection Operations",
+      "javaPattern": "List<User> adults = new ArrayList<>(); for (User u : users) { if (u.getAge() >= 18) { adults.add(u); } }",
+      "kotlinPattern": "val adults = users.filter { it.age >= 18 }",
+      "category": "COLLECTIONS",
+      "description": "Replaces Java for-each filtering/mapping loops with functional Kotlin collection operations like filter, map, and find."
+    },
+    {
+      "id": "anonymous-inner-class-to-lambda",
+      "name": "Anonymous Inner Class to SAM Lambda",
+      "javaPattern": "button.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) { doSomething(); } });",
+      "kotlinPattern": "button.setOnClickListener { doSomething() }",
+      "category": "CONCURRENCY_EVENTS",
+      "description": "Converts single-method anonymous inner classes and listeners into concise trailing Kotlin lambdas."
+    },
+    {
+      "id": "asynctask-to-coroutines",
+      "name": "AsyncTask / Thread Execution to Kotlin Coroutines",
+      "javaPattern": "new AsyncTask<Void, Void, String>() { protected String doInBackground(Void... p) { return fetchData(); } }.execute();",
+      "kotlinPattern": "CoroutineScope(Dispatchers.Main).launch { val data = withContext(Dispatchers.IO) { fetchData() } }",
+      "category": "CONCURRENCY_EVENTS",
+      "description": "Replaces legacy Android AsyncTask or background threads with structured Kotlin Coroutines and suspend functions."
+    },
+    {
+      "id": "callback-interface-to-suspend-fun",
+      "name": "Callback Interface to Suspending Function",
+      "javaPattern": "public interface DataCallback { void onSuccess(Data data); void onError(Exception e); }",
+      "kotlinPattern": "suspend fun fetchData(): Result<Data>",
+      "category": "CONCURRENCY_EVENTS",
+      "description": "Transforms asynchronous callback listeners into direct sequential suspending functions."
+    },
+    {
+      "id": "xml-layout-to-compose",
+      "name": "Android XML Layout to Jetpack Compose UI",
+      "javaPattern": "<LinearLayout><TextView android:text=\"Title\"/><Button android:text=\"Submit\"/></LinearLayout>",
+      "kotlinPattern": "@Composable fun Screen() { Column { Text(\"Title\"); Button(onClick = {}) { Text(\"Submit\") } } }",
+      "category": "UI",
+      "description": "Migrates imperative Android XML layout definitions to declarative Jetpack Compose composable components."
+    },
+    {
+      "id": "try-with-resources-to-use",
+      "name": "Try-With-Resources to .use Extension",
+      "javaPattern": "try (BufferedReader br = new BufferedReader(new FileReader(file))) { return br.readLine(); }",
+      "kotlinPattern": "File(file).bufferedReader().use { it.readLine() }",
+      "category": "RESOURCE_MANAGEMENT",
+      "description": "Replaces Java 7 try-with-resources blocks with Kotlin's auto-closing .use {} extension."
+    },
+    {
+      "id": "singleton-pattern-to-object",
+      "name": "Singleton Boilerplate to Object Declaration",
+      "javaPattern": "public class Manager { private static Manager instance; public static synchronized Manager getInstance() { ... } }",
+      "kotlinPattern": "object Manager { ... }",
+      "category": "STRUCTURE",
+      "description": "Replaces double-checked locking singleton boilerplate with Kotlin first-class object declarations."
+    },
+    {
+      "id": "switch-statement-to-when-expression",
+      "name": "Switch Statement to When Expression",
+      "javaPattern": "switch (status) { case SUCCESS: return 1; case ERROR: return 0; default: return -1; }",
+      "kotlinPattern": "return when (status) { Status.SUCCESS -> 1; Status.ERROR -> 0; else -> -1 }",
+      "category": "SYNTAX",
+      "description": "Converts Java switch statements into exhaustive, expression-based Kotlin when constructs."
+    },
+    {
+      "id": "optional-to-nullable",
+      "name": "Java Optional to Kotlin Nullable Type",
+      "javaPattern": "Optional<User> userOpt = Optional.ofNullable(user); String name = userOpt.map(User::getName).orElse(\"unknown\");",
+      "kotlinPattern": "val name = user?.name ?: \"unknown\"",
+      "category": "NULL_SAFETY",
+      "description": "Replaces Java 8 Optional wrappers with native Kotlin nullable types (T?)."
+    },
+    {
+      "id": "getter-setter-to-property-access",
+      "name": "Getter/Setter Invocations to Property Access",
+      "javaPattern": "user.setUsername(\"Alice\"); String name = user.getUsername();",
+      "kotlinPattern": "user.username = \"Alice\"; val name = user.username",
+      "category": "SYNTAX",
+      "description": "Replaces getX() and setX() method calls with idiomatic Kotlin synthetic property access syntax."
+    },
+    {
+      "id": "constant-interface-to-const-val",
+      "name": "Constant Interface to Object Const Val",
+      "javaPattern": "public interface Constants { public static final String API_URL = \"https://api.com\"; }",
+      "kotlinPattern": "object Constants { const val API_URL = \"https://api.com\" }",
+      "category": "STRUCTURE",
+      "description": "Replaces anti-pattern constant interfaces with Kotlin top-level constants or companion object const val."
+    },
+    {
+      "id": "thread-sleep-to-delay",
+      "name": "Thread.sleep to Coroutine delay",
+      "javaPattern": "Thread.sleep(1000);",
+      "kotlinPattern": "delay(1000)",
+      "category": "CONCURRENCY_EVENTS",
+      "description": "Replaces blocking Thread.sleep calls inside asynchronous scopes with non-blocking coroutine delay()."
+    },
+    {
+      "id": "arraylist-instantiation-to-mutable-list",
+      "name": "Explicit ArrayList Instantiation to mutableListOf()",
+      "javaPattern": "List<String> items = new ArrayList<>(); items.add(\"a\");",
+      "kotlinPattern": "val items = mutableListOf<String>(); items.add(\"a\")",
+      "category": "COLLECTIONS",
+      "description": "Replaces raw Java collection instantiations with Kotlin stdlib collection factory functions like mutableListOf()."
+    },
+    {
+      "id": "system-out-println-to-println",
+      "name": "System.out.println to Kotlin println",
+      "javaPattern": "System.out.println(\"Message: \" + msg);",
+      "kotlinPattern": "println(\"Message: $msg\")",
+      "category": "SYNTAX",
+      "description": "Replaces verbose System.out.println console logging with Kotlin stdlib top-level println."
+    },
+    {
+      "id": "callback-interface-to-suspend-coroutine",
+      "name": "Callback Interface / Async Listener to Suspending Function",
+      "javaPattern": "public interface DataCallback<T> { void onSuccess(T result); void onError(Exception e); }\npublic void loadUserData(String userId, DataCallback<User> callback) { ... }",
+      "kotlinPattern": "suspend fun loadUserData(userId: String): User = suspendCancellableCoroutine { continuation -> ... }",
+      "category": "ASYNC/COROUTINES",
+      "description": "Transforms asynchronous callback listeners (onSuccess/onError) and Runnable thread patterns into clean Kotlin suspend functions or Flows."
+    }
+  ]
+}

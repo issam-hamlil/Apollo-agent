@@ -1,0 +1,24 @@
+# Gradle
+.gradle/
+build/
+out/
+!.gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Environment and Credentials
+.env
+*.local
+
+# Runtime reports
+reports/*
+!reports/.gitkeep
+
+# System files
+.DS_Store
+Thumbs.db

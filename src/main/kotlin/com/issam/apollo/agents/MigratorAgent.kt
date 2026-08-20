@@ -8,17 +8,23 @@ import ai.koog.prompt.executor.llms.MultiLLMPromptExecutor
 import ai.koog.prompt.llm.LLMCapability
 import ai.koog.prompt.llm.LLMProvider
 import ai.koog.prompt.llm.LLModel
+import com.issam.apollo.config.FatalWatchdogAbortException
 import com.issam.apollo.config.LlmConfig
 import com.issam.apollo.config.LlmProvider as ApolloProvider
 import com.issam.apollo.knowledge.MigrationPattern
 import com.issam.apollo.knowledge.MigrationPatterns
+import com.issam.apollo.telemetry.ApolloTelemetry
+import com.issam.apollo.telemetry.ModuleActivityEvent
 import com.issam.apollo.state.AgentReport
 import com.issam.apollo.state.GraphState
 import com.issam.apollo.state.ModuleSpec
 import com.issam.apollo.state.ModuleStatus
 import com.issam.apollo.state.StageStatus
 import com.issam.apollo.tools.JavaAstTool
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.time.Instant
 
@@ -33,7 +39,7 @@ import java.time.Instant
  */
 class MigratorAgent(
     private val migrationPatterns: MigrationPatterns = MigrationPatterns(),
-    private val migratedOutputDir: File = File("migrated-src")
+    private val migratedOutputDir: File = File("").absoluteFile.resolve("migrated-src")
 ) {
 
     private val astTool = JavaAstTool()
@@ -44,39 +50,23 @@ class MigratorAgent(
     }
 
     private fun buildOpenAICompatibleClient(): OpenAILLMClient {
-        val (apiKey, baseUrl, chatPath) = when (LlmConfig.defaultProvider) {
-            ApolloProvider.GEMINI -> Triple(
-                LlmConfig.geminiApiKey,
-                "https://generativelanguage.googleapis.com",
-                "v1beta/openai/chat/completions"
-            )
-            ApolloProvider.GROQ -> Triple(
-                LlmConfig.groqApiKey,
-                "https://api.groq.com",
-                "openai/v1/chat/completions"
-            )
-        }
         val settings = OpenAIClientSettings(
-            baseUrl = baseUrl,
+            baseUrl = LlmConfig.ollamaBaseUrl,
             timeoutConfig = ai.koog.prompt.executor.clients.ConnectionTimeoutConfig(),
-            chatCompletionsPath = chatPath,
+            chatCompletionsPath = "chat/completions",
             responsesAPIPath = "v1/responses",
             embeddingsPath = "v1/embeddings",
             moderationsPath = "v1/moderations",
             modelsPath = "v1/models"
         )
-        return OpenAILLMClient(apiKey = apiKey, settings = settings)
+        return OpenAILLMClient(apiKey = LlmConfig.ollamaApiKey, settings = settings)
     }
 
     private val llModel: LLModel
         get() {
-            val modelId = when (LlmConfig.defaultProvider) {
-                ApolloProvider.GEMINI -> LlmConfig.defaultModel.ifBlank { "gemini-2.5-flash" }
-                ApolloProvider.GROQ   -> LlmConfig.defaultModel.ifBlank { "llama-3.3-70b-versatile" }
-            }
             return LLModel(
                 provider = LLMProvider.OpenAI,
-                id = modelId,
+                id = LlmConfig.ollamaModel,
                 capabilities = listOf(
                     LLMCapability.Completion,
                     LLMCapability.Temperature,
@@ -110,69 +100,100 @@ class MigratorAgent(
         println("[MigratorAgent] Migration Order: $moduleOrder")
 
         var currentState = state
-        val newMigratedCode = mutableMapOf<String, String>()
-        val newModuleStatuses = currentState.moduleStatuses.toMutableMap()
-        val configErrorModules = mutableListOf<String>()
-        val transientErrorModules = mutableListOf<String>()
+        val newMigratedCode = java.util.concurrent.ConcurrentHashMap<String, String>()
+        val newModuleStatuses = java.util.concurrent.ConcurrentHashMap(currentState.moduleStatuses)
+        val configErrorModules = java.util.Collections.synchronizedList(mutableListOf<String>())
+        val transientErrorModules = java.util.Collections.synchronizedList(mutableListOf<String>())
 
-        for (className in moduleOrder) {
-            println("[MigratorAgent] ── Migrating module: $className ──")
+        // Run all module migrations concurrently — allows small models (7b) and large models (14b)
+        // to execute simultaneously without one blocking the others.
+        runBlocking {
+            moduleOrder.map { className ->
+                async {
+                    println("[MigratorAgent] ── Migrating module: $className ──")
+                    ApolloTelemetry.emit(ModuleActivityEvent(className, "MIGRATING", "generating Kotlin", active = true))
 
-            val spec = currentState.moduleSpecs[className]
-            val javaFilePath = spec?.sourceFilePath
-                ?: currentState.javaFiles.firstOrNull { File(it).nameWithoutExtension == className }
+                    // If module is already migrated (e.g. in resume mode), preserve existing code
+                    val existingCode = currentState.migratedCode["$className.kt"]
+                    if (!existingCode.isNullOrBlank()) {
+                        println("[MigratorAgent] Module '$className' already migrated. Preserving existing Kotlin code.")
+                        newMigratedCode["$className.kt"] = existingCode
+                        newModuleStatuses[className] = currentState.moduleStatuses[className] ?: ModuleStatus.MIGRATED
+                        return@async
+                    }
 
-            if (javaFilePath == null || !File(javaFilePath).exists()) {
-                println("[MigratorAgent] Warning: Source file for $className not found ($javaFilePath). Skipping.")
-                continue
-            }
+                    val spec = currentState.moduleSpecs[className]
+                    val javaFilePath = spec?.sourceFilePath
+                        ?: currentState.javaFiles.firstOrNull { File(it).nameWithoutExtension == className }
 
-            val javaSource = File(javaFilePath).readText()
-            val matchingPatterns = migrationPatterns.findMatchingPatternsForSpec(
-                spec ?: astTool.parseJavaFile(File(javaFilePath)).let {
-                    ModuleSpec(
-                        className = it.className,
-                        packageName = it.packageName,
-                        imports = it.imports,
-                        fields = it.fields,
-                        methods = it.methods,
-                        sourceFilePath = it.sourceFilePath
+                    if (javaFilePath == null || !File(javaFilePath).exists()) {
+                        println("[MigratorAgent] Warning: Source file for $className not found ($javaFilePath). Skipping.")
+                        return@async
+                    }
+
+                    val javaSource = File(javaFilePath).readText()
+                    val matchingPatterns = migrationPatterns.findMatchingPatternsForSpec(
+                        spec ?: astTool.parseJavaFile(File(javaFilePath)).let {
+                            ModuleSpec(
+                                className = it.className,
+                                packageName = it.packageName,
+                                imports = it.imports,
+                                fields = it.fields,
+                                methods = it.methods,
+                                sourceFilePath = it.sourceFilePath
+                            )
+                        },
+                        javaSource
                     )
-                },
-                javaSource
-            )
 
-            // Gather context from previously migrated Kotlin dependencies
-            val dependencyContext = buildDependencyContext(spec, newMigratedCode)
+                    // Gather context from dependency signatures if already available
+                    val dependencyContext = buildDependencyContext(spec, currentState.migratedCode)
 
-            val llmResult = tryMigrateWithLLMResult(className, spec, javaSource, matchingPatterns, dependencyContext)
-            val kotlinCode: String
+                    val timeoutMs = LlmConfig.moduleTimeoutMs
+                    val kotlinCode: String = try {
+                        withTimeoutOrNull(timeoutMs) {
+                            val llmResult = tryMigrateWithLLMResult(className, spec, javaSource, matchingPatterns, dependencyContext)
+                            if (llmResult.code != null) {
+                                println("[MigratorAgent] Successfully generated Kotlin code via LLM for $className.")
+                                llmResult.code
+                            } else if (llmResult.isConfigError) {
+                                println("[MigratorAgent] Config/Model 404 error for $className. Using AST/Rule-based engine.")
+                                configErrorModules.add(className)
+                                migrateWithRules(className, javaSource, spec)
+                            } else {
+                                println("[MigratorAgent] Transient LLM error for $className. Using AST/Rule-based engine.")
+                                transientErrorModules.add(className)
+                                migrateWithRules(className, javaSource, spec)
+                            }
+                        } ?: run {
+                            val timeoutSeconds = timeoutMs / 1000
+                            println("⚠️ [Timeout] Module '$className' migration exceeded $timeoutSeconds seconds ($timeoutMs ms). Aborting attempt and falling back to rule-based engine.")
+                            transientErrorModules.add(className)
+                            migrateWithRules(className, javaSource, spec)
+                        }
+                    } catch (e: FatalWatchdogAbortException) {
+                        throw e
+                    } catch (e: Exception) {
+                        if (e.cause is FatalWatchdogAbortException) throw e.cause as FatalWatchdogAbortException
+                        println("[MigratorAgent] Exception during migration for $className: ${e.message}. Using rule-based engine.")
+                        transientErrorModules.add(className)
+                        migrateWithRules(className, javaSource, spec)
+                    }
 
-            if (llmResult.code != null) {
-                println("[MigratorAgent] Successfully generated Kotlin code via LLM for $className.")
-                kotlinCode = llmResult.code
-            } else if (llmResult.isConfigError) {
-                println("[MigratorAgent] Config/Model 404 error for $className. Using AST/Rule-based engine.")
-                configErrorModules.add(className)
-                kotlinCode = migrateWithRules(className, javaSource)
-            } else {
-                println("[MigratorAgent] Transient LLM error for $className. Using AST/Rule-based engine.")
-                transientErrorModules.add(className)
-                kotlinCode = migrateWithRules(className, javaSource)
-            }
+                    // Save Kotlin source file to migrated-src/
+                    val packagePath = (spec?.packageName ?: "").replace('.', '/')
+                    val targetFolder = if (packagePath.isNotBlank()) File(migratedOutputDir, packagePath) else migratedOutputDir
+                    targetFolder.mkdirs()
 
-            // Save Kotlin source file to migrated-src/
-            val packagePath = (spec?.packageName ?: "").replace('.', '/')
-            val targetFolder = if (packagePath.isNotBlank()) File(migratedOutputDir, packagePath) else migratedOutputDir
-            targetFolder.mkdirs()
+                    val outputFile = File(targetFolder, "$className.kt")
+                    outputFile.writeText(kotlinCode)
 
-            val outputFile = File(targetFolder, "$className.kt")
-            outputFile.writeText(kotlinCode)
+                    println("[MigratorAgent]   Saved Kotlin source to: ${outputFile.path}")
 
-            println("[MigratorAgent]   Saved Kotlin source to: ${outputFile.path}")
-
-            newMigratedCode["$className.kt"] = kotlinCode
-            newModuleStatuses[className] = ModuleStatus.MIGRATED
+                    newMigratedCode["$className.kt"] = kotlinCode
+                    newModuleStatuses[className] = ModuleStatus.MIGRATED
+                }
+            }.awaitAll()
         }
 
         val reportMetrics = mutableMapOf(
@@ -218,12 +239,37 @@ class MigratorAgent(
         if (spec == null || spec.dependsOn.isEmpty()) return "No internal module dependencies."
 
         val sb = StringBuilder()
-        sb.appendLine("The following dependencies for this module have already been migrated to Kotlin:")
+        sb.appendLine("The following dependency signatures have already been migrated to Kotlin (for reference):")
         for (dep in spec.dependsOn) {
             val code = currentMigratedCode["$dep.kt"]
             if (code != null) {
                 sb.appendLine("--- $dep.kt ---")
-                sb.appendLine(code)
+                val lines = code.lines()
+                if (lines.size <= 40) {
+                    sb.appendLine(code)
+                } else {
+                    // Extract package, imports, class/object/interface lines, val/var properties, and fun signatures
+                    val signatureLines = lines.filter { line ->
+                        val trimmed = line.trim()
+                        trimmed.startsWith("package ") ||
+                        trimmed.startsWith("import ") ||
+                        trimmed.startsWith("class ") ||
+                        trimmed.startsWith("data class ") ||
+                        trimmed.startsWith("object ") ||
+                        trimmed.startsWith("interface ") ||
+                        trimmed.startsWith("fun ") ||
+                        trimmed.startsWith("val ") ||
+                        trimmed.startsWith("var ") ||
+                        trimmed.startsWith("const val ") ||
+                        trimmed.startsWith("companion object") ||
+                        trimmed == "}"
+                    }
+                    if (signatureLines.isNotEmpty()) {
+                        sb.appendLine(signatureLines.joinToString("\n"))
+                    } else {
+                        sb.appendLine(code.take(1500) + "\n// ... [truncated for brevity]")
+                    }
+                }
                 sb.appendLine()
             }
         }
@@ -247,7 +293,6 @@ class MigratorAgent(
         patterns: List<MigrationPattern>,
         dependencyContext: String
     ): MigrationLlmResult {
-        try { Thread.sleep(6000) } catch (e: Exception) {}
         val patternPrompt = migrationPatterns.formatPatternsForPrompt(patterns)
 
         val systemPromptStr = """
@@ -257,7 +302,7 @@ class MigratorAgent(
             Follow these strict guidelines:
             1. Produce ONLY valid, compilable Kotlin code. Do NOT wrap output in markdown backticks or explanations.
             2. Preserve exact package declaration, class hierarchy, method names, and business logic semantics.
-            3. Apply Kotlin null safety (?. , ?: , requireNotNull), data classes for POJOs, object/extension functions for utilities, and collection functions (filter, map, find).
+            3. Apply Kotlin null safety (?. , ?: , requireNotNull), data classes for POJOs, object/extension functions for utilities, and collection functions (filter, map, find). Declare a return type nullable (e.g. `String?`) ONLY when the Java method has a path that actually returns null. A guard like `if (str.isEmpty()) return str;` returns the empty string, not null - keep that return type non-null and return the original value. Where Java dereferences a parameter without a null check, keep the Kotlin parameter non-nullable so the same NullPointerException still escapes; do not add safe calls that change observable behaviour.
             4. Ensure compatibility with previously migrated Kotlin dependency classes provided in context.
             5. STRICT CLEAN KOTLIN: Do NOT include trailing semicolons (`;`) on package statements, import lines, or code lines. Remove all unused imports (e.g., `import java.util.ArrayList`).
             6. NO REDECLARATIONS: Do NOT redeclare classes (e.g., `User`) that are already provided in dependency context or package scope.
@@ -288,45 +333,28 @@ class MigratorAgent(
             Output ONLY the full transformed Kotlin source file text without markdown block markers.
         """.trimIndent()
 
-        val agent = AIAgent(
-            promptExecutor = promptExecutor,
-            llmModel       = llModel,
-            toolRegistry   = ToolRegistry {},
-            systemPrompt   = systemPromptStr,
-            temperature    = 0.2,
-            maxIterations  = 3
-        )
-
-        var attempt = 0
-        while (attempt < 3) {
-            attempt++
-            try {
-                val response = runBlocking {
-                    agent.run(userPromptStr)
-                }
-                if (response != null) return MigrationLlmResult(code = cleanLLMOutput(response))
-            } catch (e: Exception) {
-                val msg = e.message ?: ""
-                if (LlmConfig.isConfigOr404Error(e)) {
-                    System.err.println("==========================================================================")
-                    System.err.println("⚠️ LOUD WARNING [MigratorAgent]: LLM CONFIG / MODEL NOT FOUND ERROR for '$className'!")
-                    System.err.println("   Details: ${e.message}")
-                    System.err.println("   Falling back to AST/Rule engine. Flagging usedFallbackDueToConfigError = true")
-                    System.err.println("==========================================================================")
-                    return MigrationLlmResult(isConfigError = true, errorMessage = e.message ?: "Config/404 Error")
-                } else if ((msg.contains("429") || msg.contains("rate limit", ignoreCase = true) || msg.contains("RESOURCE_EXHAUSTED", ignoreCase = true)) && attempt < 3) {
-                    System.err.println("[MigratorAgent] 429 Rate limit encountered for $className (attempt $attempt/3). Waiting 15s before retry...")
-                    try { Thread.sleep(15000) } catch (ignored: Exception) {}
-                } else {
-                    System.err.println("[MigratorAgent] Transient LLM call error for $className: ${e.message}")
-                    return MigrationLlmResult(isTransientError = true, errorMessage = e.message ?: "Transient Error")
-                }
+        return try {
+            val rawCode = LlmConfig.callLlmWithFallback(userPromptStr, systemPromptStr, temperature = 0.2, moduleName = className)
+            MigrationLlmResult(code = cleanLLMOutput(rawCode, className, dependencyContext))
+        } catch (e: FatalWatchdogAbortException) {
+            throw e
+        } catch (e: Exception) {
+            if (e.cause is FatalWatchdogAbortException) throw e.cause as FatalWatchdogAbortException
+            val msg = e.message ?: ""
+            if (LlmConfig.isConfigOr404Error(e)) {
+                System.err.println("==========================================================================")
+                System.err.println("⚠️ LOUD WARNING [MigratorAgent]: LLM CONFIG / MODEL NOT FOUND ERROR for '$className'!")
+                System.err.println("   Details: $msg")
+                System.err.println("==========================================================================")
+                MigrationLlmResult(isConfigError = true, errorMessage = msg)
+            } else {
+                System.err.println("[MigratorAgent] LLM call failed for $className: $msg.")
+                MigrationLlmResult(isTransientError = true, errorMessage = msg)
             }
         }
-        return MigrationLlmResult(isTransientError = true, errorMessage = "Max LLM retries reached")
     }
 
-    private fun cleanLLMOutput(rawText: String): String {
+    private fun cleanLLMOutput(rawText: String, className: String = "", dependencyContext: String = ""): String {
         var text = rawText.trim()
         if (text.startsWith("```kotlin")) {
             text = text.substringAfter("```kotlin")
@@ -337,120 +365,279 @@ class MigratorAgent(
             text = text.substringBeforeLast("```")
         }
 
-        val cleanedLines = text.lines().map { line ->
+        val seenImports = mutableSetOf<String>()
+        val cleanedLines = mutableListOf<String>()
+
+        for (line in text.lines()) {
             val trimmed = line.trim()
-            if ((trimmed.startsWith("package ") || trimmed.startsWith("import ")) && trimmed.endsWith(";")) {
-                line.substringBeforeLast(";").trimEnd()
+            if (trimmed.startsWith("package ") && trimmed.endsWith(";")) {
+                cleanedLines.add(line.substringBeforeLast(";").trimEnd())
+            } else if (trimmed.startsWith("import ")) {
+                val cleanImport = if (trimmed.endsWith(";")) line.substringBeforeLast(";").trimEnd() else line
+                val normalizedImport = cleanImport.trim()
+                if (normalizedImport.startsWith("import kotlinx.android.synthetic")) continue
+                if (normalizedImport == "import java.util.ArrayList" && !text.contains("ArrayList<") && !text.contains("ArrayList()")) continue
+                if (normalizedImport == "import java.util.Objects" && !text.contains("Objects.")) continue
+                if (seenImports.add(normalizedImport)) {
+                    cleanedLines.add(cleanImport)
+                }
             } else {
-                line
+                cleanedLines.add(line)
             }
-        }.filterNot { line ->
-            val trimmed = line.trim()
-            (trimmed == "import java.util.ArrayList" && !text.contains("ArrayList<") && !text.contains("ArrayList()")) ||
-            (trimmed == "import java.util.Objects" && !text.contains("Objects."))
         }
 
-        return cleanedLines.joinToString("\n").trim()
+        var result = cleanedLines.joinToString("\n").trim()
+
+        // Clean duplicate keywords
+        result = result
+            .replace(Regex("""\bclass\s+class\b"""), "class")
+            .replace(Regex("""\bfun\s+fun\b"""), "fun")
+            .replace(Regex("""\bval\s+val\b"""), "val")
+            .replace(Regex("""\bvar\s+var\b"""), "var")
+
+        return result
     }
 
-    private fun migrateWithRules(className: String, javaCode: String): String {
-        val pkgLine = (javaCode.lines().firstOrNull { it.startsWith("package ") } ?: "package com.example.legacy").removeSuffix(";")
+    private fun migrateWithRules(className: String, javaCode: String, spec: ModuleSpec? = null): String {
+        val packageName = spec?.packageName?.ifBlank { null }
+            ?: javaCode.lines().firstOrNull { it.trim().startsWith("package ") }
+                ?.removePrefix("package ")?.removeSuffix(";")?.trim()
+            ?: "com.issam.apollo.migrated"
 
-        return when {
-            javaCode.contains("AsyncDataLoader") || javaCode.contains("DataCallback") -> {
-                """
-                |$pkgLine
-                |
-                |import kotlinx.coroutines.Dispatchers
-                |import kotlinx.coroutines.withContext
-                |
-                |/**
-                | * Modernized by Apollo Agent (Stage 3 Migrator)
-                | * Pattern: Callback Interface -> Kotlin Suspending Function
-                | */
-                |class AsyncDataLoader {
-                |
-                |    suspend fun loadUserData(userId: String?): User? = withContext(Dispatchers.IO) {
-                |        if (userId.isNullOrBlank()) return@withContext null
-                |        User(
-                |            id = userId,
-                |            username = "User_${'$'}userId",
-                |            email = "${'$'}userId@example.com",
-                |            age = 30
-                |        )
-                |    }
-                |}
-                """.trimMargin()
+        val sb = StringBuilder()
+        sb.appendLine("package $packageName")
+        sb.appendLine()
+
+        val isActivity = className.endsWith("Activity") ||
+            (spec?.imports?.any { it.contains("Activity") } == true) ||
+            javaCode.contains("AppCompatActivity") ||
+            javaCode.contains("extends Activity")
+
+        val isDbHelper = className.endsWith("OpenHelper") ||
+            className.endsWith("DatabaseHelper") ||
+            javaCode.contains("SQLiteOpenHelper") ||
+            (spec?.imports?.any { it.contains("SQLiteOpenHelper") } == true)
+
+        val safeImports = mutableSetOf<String>()
+        if (spec != null && spec.imports.isNotEmpty()) {
+            spec.imports.forEach { imp ->
+                val cleaned = imp.trim().removePrefix("import ").removeSuffix(";").trim()
+                if (cleaned.isNotBlank() && !cleaned.startsWith("kotlinx.android.synthetic")) {
+                    safeImports.add(cleaned)
+                }
             }
-            javaCode.contains("get") && javaCode.contains("set") && !javaCode.contains("class UserService") -> {
-                """
-                |$pkgLine
-                |
-                |/**
-                | * Modernized by Apollo Agent (Stage 3 Migrator)
-                | * Pattern: POJO -> Kotlin Data Class
-                | */
-                |data class $className(
-                |    var id: String? = null,
-                |    var username: String? = null,
-                |    var email: String? = null,
-                |    var age: Int = 0
-                |)
-                """.trimMargin()
-            }
-            javaCode.contains("StringUtils") || (javaCode.contains("static") && !javaCode.contains("class UserService")) -> {
-                """
-                |$pkgLine
-                |
-                |/**
-                | * Modernized by Apollo Agent (Stage 3 Migrator)
-                | * Pattern: Utility Class -> Kotlin Object & Extension Functions
-                | */
-                |object $className {
-                |    fun isEmpty(str: String?): Boolean = str.isNullOrBlank()
-                |
-                |    fun capitalize(str: String?): String? {
-                |        if (str.isNullOrEmpty()) return str
-                |        return str.substring(0, 1).uppercase() + str.substring(1).lowercase()
-                |    }
-                |}
-                """.trimMargin()
-            }
-            else -> {
-                """
-                |$pkgLine
-                |
-                |/**
-                | * Modernized by Apollo Agent (Stage 3 Migrator)
-                | * Pattern: Collections, Null Safety & Idiomatic Extensions
-                | */
-                |class $className {
-                |    private val userList: MutableList<User> = mutableListOf()
-                |
-                |    fun addUser(user: User?) {
-                |        requireNotNull(user) { "User cannot be null" }
-                |        require(!user.id.isNullOrEmpty()) { "User ID cannot be null or empty" }
-                |        userList.add(user)
-                |    }
-                |
-                |    fun findById(id: String?): User? {
-                |        if (id == null) return null
-                |        return userList.find { it.id == id }
-                |    }
-                |
-                |    fun filterAdults(): List<User> {
-                |        return userList.filter { it.age >= 18 }
-                |    }
-                |
-                |    fun formatUserSummary(user: User?): String {
-                |        if (user == null) return "N/A"
-                |        val name = user.username ?: "Anonymous"
-                |        val email = user.email ?: "no-email"
-                |        return "${'$'}name (${'$'}email)"
-                |    }
-                |}
-                """.trimMargin()
+        } else {
+            javaCode.lines().filter { it.trim().startsWith("import ") }.forEach { line ->
+                val cleaned = line.trim().removePrefix("import ").removeSuffix(";").trim()
+                if (cleaned.isNotBlank() && !cleaned.startsWith("kotlinx.android.synthetic")) {
+                    safeImports.add(cleaned)
+                }
             }
         }
+
+        if (isActivity) {
+            safeImports.add("android.os.Bundle")
+            if (javaCode.contains("AppCompatActivity") || (spec?.imports?.any { it.contains("AppCompatActivity") } == true)) {
+                safeImports.add("androidx.appcompat.app.AppCompatActivity")
+            } else {
+                safeImports.add("android.app.Activity")
+            }
+        }
+
+        if (isDbHelper) {
+            safeImports.add("android.content.Context")
+            safeImports.add("android.database.sqlite.SQLiteDatabase")
+            safeImports.add("android.database.sqlite.SQLiteOpenHelper")
+        }
+
+        safeImports.filterNot { it.startsWith("kotlinx.android.synthetic") }
+            .distinct()
+            .forEach { sb.appendLine("import $it") }
+
+        sb.appendLine()
+        sb.appendLine("/**")
+        sb.appendLine(" * Modernized by Apollo Agent (Stage 3 Migrator Fallback)")
+        sb.appendLine(" * Class: $className")
+        sb.appendLine(" */")
+
+        val isAppCompat = javaCode.contains("AppCompatActivity") || (spec?.imports?.any { it.contains("AppCompatActivity") } == true)
+
+        if (isActivity) {
+            val superType = if (isAppCompat) "AppCompatActivity()" else "Activity()"
+            sb.appendLine("open class $className : $superType {")
+            sb.appendLine()
+
+            val contentViewMatch = Regex("""setContentView\s*\(\s*(R\.layout\.[a-zA-Z0-9_]+)\s*\)""").find(javaCode)
+            val layoutRes = contentViewMatch?.groupValues?.get(1)
+
+            sb.appendLine("    override fun onCreate(savedInstanceState: Bundle?) {")
+            sb.appendLine("        super.onCreate(savedInstanceState)")
+            if (layoutRes != null) {
+                sb.appendLine("        setContentView($layoutRes)")
+            }
+            sb.appendLine("        // TODO: Apollo fallback stub — initialize views using findViewById")
+            sb.appendLine("    }")
+            sb.appendLine()
+
+            val nonLifecycleMethods = spec?.methods?.filterNot { it.contains("onCreate(") } ?: emptyList()
+            for (rawMethod in nonLifecycleMethods) {
+                val methodLines = parseMethodSpec(rawMethod, isActivity = true)
+                methodLines.forEach { sb.appendLine("    $it") }
+                sb.appendLine()
+            }
+
+            sb.appendLine("}")
+        } else if (isDbHelper) {
+            sb.appendLine("open class $className(context: Context) : SQLiteOpenHelper(context, \"app.db\", null, 1) {")
+            sb.appendLine()
+            sb.appendLine("    override fun onCreate(db: SQLiteDatabase) {")
+            sb.appendLine("        // TODO: Apollo fallback stub — database initialization")
+            sb.appendLine("    }")
+            sb.appendLine()
+            sb.appendLine("    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {")
+            sb.appendLine("        // TODO: Apollo fallback stub — database upgrade")
+            sb.appendLine("    }")
+            sb.appendLine()
+
+            val otherMethods = spec?.methods?.filterNot { it.contains("onCreate(") || it.contains("onUpgrade(") } ?: emptyList()
+            for (rawMethod in otherMethods) {
+                val methodLines = parseMethodSpec(rawMethod)
+                methodLines.forEach { sb.appendLine("    $it") }
+                sb.appendLine()
+            }
+
+            sb.appendLine("}")
+        } else {
+            sb.appendLine("open class $className {")
+            sb.appendLine()
+
+            if (spec?.fields?.isNotEmpty() == true) {
+                for (f in spec.fields) {
+                    val decl = parseFieldSpec(f)
+                    sb.appendLine("    $decl")
+                }
+                sb.appendLine()
+            }
+
+            if (spec?.methods?.isNotEmpty() == true) {
+                for (m in spec.methods) {
+                    val methodLines = parseMethodSpec(m)
+                    methodLines.forEach { sb.appendLine("    $it") }
+                    sb.appendLine()
+                }
+            }
+
+            sb.appendLine("}")
+        }
+
+        return sb.toString().trim()
+    }
+
+    private fun parseFieldSpec(raw: String): String {
+        val trimmed = raw.trim()
+        if (trimmed.matches(Regex("""[a-zA-Z_][a-zA-Z0-9_]*\s*:\s*.+"""))) {
+            return "var $trimmed = TODO(\"stub\")"
+        }
+        val javaPattern = Regex("""^(?:(?:private|protected|public|static|final|transient|volatile)\s+)*([\w<>,?\[\]]+)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*$""")
+        val match = javaPattern.matchEntire(trimmed)
+        if (match != null) {
+            val javaType = match.groupValues[1]
+            val name = match.groupValues[2]
+            val kotlinType = javaTypeToKotlin(javaType)
+            return "var $name: $kotlinType? = null"
+        }
+        return "// $trimmed"
+    }
+
+    private fun parseMethodSpec(raw: String, isActivity: Boolean = false): List<String> {
+        val trimmed = raw.trim()
+        if (trimmed.startsWith("fun ") || trimmed.startsWith("override fun ")) {
+            val sigOnly = trimmed.substringBefore("{").trim().substringBefore("=").trim()
+            val returnType = if (sigOnly.contains(":")) sigOnly.substringAfterLast(":").trim() else "Unit"
+            val isUnit = returnType == "Unit" || returnType.isBlank()
+            return if (isUnit) {
+                listOf("$sigOnly {", "    TODO(\"Apollo fallback stub — manual migration required\")", "}")
+            } else {
+                listOf("$sigOnly =", "    TODO(\"Apollo fallback stub — manual migration required\")")
+            }
+        }
+        val javaMethod = Regex("""^(?:(?:private|protected|public|static|final|synchronized|abstract|native)\s+)*([\w<>,?\[\]]+)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([^)]*)\)""")
+        val match = javaMethod.find(trimmed)
+        if (match != null) {
+            val returnTypeJava = match.groupValues[1]
+            val name = match.groupValues[2]
+            val paramsRaw = match.groupValues[3].trim()
+            val kotlinReturn = javaTypeToKotlin(returnTypeJava)
+            val isVoid = returnTypeJava == "void" || returnTypeJava == "Void"
+
+            val isOverride = isActivity && name in setOf(
+                "onCreateOptionsMenu", "onOptionsItemSelected", "onActivityResult",
+                "onResume", "onPause", "onDestroy", "onStart", "onStop", "onBackPressed"
+            )
+            val funPrefix = if (isOverride) "override fun" else "fun"
+
+            val params = if (paramsRaw.isBlank()) "" else {
+                paramsRaw.split(",").joinToString(", ") { param ->
+                    val parts = param.trim().split(Regex("\\s+"))
+                    if (parts.size >= 2) {
+                        val pType = javaTypeToKotlin(parts.dropLast(1).joinToString(" "))
+                        val pName = parts.last()
+                        "$pName: $pType"
+                    } else {
+                        param.trim()
+                    }
+                }
+            }
+
+            if (isOverride) {
+                return when (name) {
+                    "onCreateOptionsMenu" -> listOf("override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean = super.onCreateOptionsMenu(menu)")
+                    "onOptionsItemSelected" -> listOf("override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean = super.onOptionsItemSelected(item)")
+                    "onActivityResult" -> listOf("override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {", "    super.onActivityResult(requestCode, resultCode, data)", "}")
+                    "onResume", "onPause", "onDestroy", "onStart", "onStop", "onBackPressed" -> listOf("override fun $name() {", "    super.$name()", "}")
+                    else -> listOf("override fun $name($params) {", "    TODO(\"Apollo fallback stub — manual migration required\")", "}")
+                }
+            }
+
+            return if (isVoid) {
+                listOf(
+                    "$funPrefix $name($params) {",
+                    "    TODO(\"Apollo fallback stub — manual migration required\")",
+                    "}"
+                )
+            } else {
+                listOf(
+                    "$funPrefix $name($params): $kotlinReturn =",
+                    "    TODO(\"Apollo fallback stub — manual migration required\")"
+                )
+            }
+        }
+        return listOf("// $trimmed")
+    }
+
+    private fun javaTypeToKotlin(javaType: String): String {
+        val stripped = javaType.trim().removeSuffix("[]")
+        val isArray = javaType.trim().endsWith("[]")
+        val kotlin = when (stripped.lowercase()) {
+            "int", "integer"         -> "Int"
+            "long"                   -> "Long"
+            "double"                 -> "Double"
+            "float"                  -> "Float"
+            "boolean"                -> "Boolean"
+            "char", "character"      -> "Char"
+            "byte"                   -> "Byte"
+            "short"                  -> "Short"
+            "void"                   -> "Unit"
+            "string"                 -> "String"
+            "object"                 -> "Any"
+            "list"                   -> "List<Any>"
+            "arraylist"              -> "MutableList<Any>"
+            "map"                    -> "Map<Any, Any>"
+            "hashmap"                -> "HashMap<Any, Any>"
+            "set"                    -> "Set<Any>"
+            "hashset"                -> "HashSet<Any>"
+            else                     -> stripped
+        }
+        return if (isArray) "Array<$kotlin>" else kotlin
     }
 }

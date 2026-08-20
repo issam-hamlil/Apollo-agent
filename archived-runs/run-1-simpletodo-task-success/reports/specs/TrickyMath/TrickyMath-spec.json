@@ -1,0 +1,11 @@
+{
+    "className": "TrickyMath",
+    "packageName": "com.example.legacy",
+    "methods": [
+        "public int safeAdd(int a, int b)",
+        "public String formatCurrency(double amount)",
+        "public boolean isBitSet(int number, int bitIndex)"
+    ],
+    "businessLogicSummary": "**TrickyMath** — `com.example.legacy`\n\n**Fields (0):** \n**Methods (3):**\n  - `public int safeAdd(int a, int b)`\n  - `public String formatCurrency(double amount)`\n  - `public boolean isBitSet(int number, int bitIndex)`\n\n*(AST-only summary — LLM unavailable)*\n",
+    "sourceFilePath": "D:\\Projects\\Apollo-agent\\sample-legacy\\src\\main\\java\\com\\example\\legacy\\TrickyMath.java"
+}

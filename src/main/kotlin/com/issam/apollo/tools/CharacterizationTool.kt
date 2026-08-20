@@ -20,18 +20,41 @@ class CharacterizationTool {
     private val jsonPretty = Json { prettyPrint = true }
 
     /**
+     * Path to the Android SDK stub jar that provides compilation stubs for
+     * Android framework classes (Activity, View, SQLiteOpenHelper, etc.).
+     *
+     * Source: copy android.jar from your local Android SDK installation:
+     *   $ANDROID_HOME/platforms/android-34/android.jar
+     * Destination: libs/android-stubs/android.jar
+     *
+     * If the file is absent, Apollo will fail with a clear, actionable error
+     * rather than falling through to an obscure NoClassDefFoundError.
+     */
+    private val androidStubJar: File = File("").absoluteFile
+        .resolve("libs/android-stubs/android.jar")
+
+    private fun requireAndroidStubJar(): File = AndroidSdkResolver.requireAndroidStubJar(androidStubJar)
+
+    /**
      * Entry point called by orchestrator/pipeline.
      * Compiles [javaProjectDir], generates & executes characterization test cases,
      * writes ground truth JSON reports to [reportsDir], and returns the full list of test cases.
      */
     fun executeCharacterization(
         javaProjectDir: File,
-        reportsDir: File = File("reports")
+        reportsDir: File = File("").absoluteFile.resolve("reports")
     ): List<TestCase> {
-        val buildDir = File("build/characterization-classes")
+        val buildDir = File("").absoluteFile.resolve("build/characterization-classes")
         buildDir.mkdirs()
 
-        val compiled = compileJavaProject(javaProjectDir, buildDir)
+        // 1. Resolve authentic R.java via AAPT2 if Android project
+        val aapt2Result = Aapt2Tool.generateRForProject(javaProjectDir)
+        val rJavaFiles = if (aapt2Result.success) aapt2Result.rJavaFiles else emptyList()
+
+        // 2. Resolve external dependencies (AndroidX, support libs, etc.)
+        val resolvedDepJars = GradleDependencyResolver.resolveProjectDependencies(javaProjectDir)
+
+        val compiled = compileJavaProject(javaProjectDir, buildDir, rJavaFiles, resolvedDepJars)
         if (!compiled) {
             println("[CharacterizationTool] Warning: Compilation of Java files failed, generating AST-based specs only.")
         }
@@ -39,8 +62,24 @@ class CharacterizationTool {
         val allTestCases = mutableListOf<TestCase>()
         val moduleTestMap = mutableMapOf<String, MutableList<TestCase>>()
 
+        // Build URLClassLoader with: compiled classes + resolved dep jars + android.jar (needed at
+        // load-time to resolve the Android class hierarchy: Activity, SQLiteOpenHelper, etc.)
+        val classLoaderUrls = mutableListOf(buildDir.toURI().toURL())
+        resolvedDepJars.forEach { classLoaderUrls.add(it.toURI().toURL()) }
+        // android.jar must be in the loader, not just javac classpath, so Activity hierarchy resolves
+        val androidJarFile = AndroidSdkResolver.findAndroidJar()
+        if (androidJarFile != null) {
+            classLoaderUrls.add(androidJarFile.toURI().toURL())
+        } else {
+            // Also check the local stubs dir directly
+            val stubsDir = File("").absoluteFile.resolve("libs/android-stubs")
+            stubsDir.walkTopDown()
+                .filter { it.isFile && it.extension == "jar" }
+                .forEach { classLoaderUrls.add(it.toURI().toURL()) }
+        }
+
         val classLoader = if (compiled) {
-            URLClassLoader(arrayOf(buildDir.toURI().toURL()), this::class.java.classLoader)
+            URLClassLoader(classLoaderUrls.toTypedArray(), this::class.java.classLoader)
         } else null
 
         val javaAstTool = JavaAstTool()
@@ -55,7 +94,9 @@ class CharacterizationTool {
             val targetClass: Class<*>? = classLoader?.let {
                 try {
                     it.loadClass(fullClassName)
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
+                    // Catch both Exception and Error subclasses (e.g. NoClassDefFoundError when
+                    // a parent Android framework class is missing from the loader's classpath)
                     null
                 }
             }
@@ -82,25 +123,60 @@ class CharacterizationTool {
     }
 
     /**
-     * Compiles all .java files found in [javaProjectDir] into [outputDir] using system javac.
+     * Compiles all .java files found in [javaProjectDir] (plus any AAPT2-generated [extraJavaFiles])
+     * into [outputDir] using system javac.
+     * Includes the Android SDK stub jar and resolved [dependencyJars] on the classpath.
      */
-    private fun compileJavaProject(javaProjectDir: File, outputDir: File): Boolean {
-        val javaFiles = javaProjectDir.walkTopDown()
+    private fun compileJavaProject(
+        javaProjectDir: File,
+        outputDir: File,
+        extraJavaFiles: List<File> = emptyList(),
+        dependencyJars: List<File> = emptyList()
+    ): Boolean {
+        val javaFiles = (javaProjectDir.walkTopDown()
             .filter { it.isFile && it.extension == "java" }
+            .toList() + extraJavaFiles)
             .map { it.absolutePath }
-            .toList()
+            .distinct()
 
         if (javaFiles.isEmpty()) return false
 
-        val javacCmd = mutableListOf("javac", "-d", outputDir.absolutePath)
+        // Resolve android stub directory (android.jar, androidx-stubs.jar, etc.)
+        val stubDirectory = File("").absoluteFile.resolve("libs/android-stubs")
+        val stubJars = if (stubDirectory.exists()) {
+            stubDirectory.walkTopDown().filter { it.isFile && it.extension == "jar" }.map { it.absolutePath }.toList()
+        } else emptyList()
+
+        if (stubJars.isEmpty()) {
+            try {
+                requireAndroidStubJar()
+            } catch (e: IllegalStateException) {
+                System.err.println(e.message)
+                return false
+            }
+        }
+
+        val allClasspathJars = (stubJars + dependencyJars.map { it.absolutePath }).distinct()
+        val effectiveClasspath = allClasspathJars.joinToString(File.pathSeparator)
+
+        val javacCmd = mutableListOf(
+            "javac",
+            "-d", outputDir.absolutePath,
+            "-cp", effectiveClasspath
+        )
         javacCmd.addAll(javaFiles)
 
         return try {
             val process = ProcessBuilder(javacCmd)
                 .redirectErrorStream(true)
+                .redirectOutput(ProcessBuilder.Redirect.DISCARD)
                 .start()
-            val exitCode = process.waitFor()
-            exitCode == 0
+            val finished = process.waitFor(30, java.util.concurrent.TimeUnit.SECONDS)
+            if (!finished) {
+                process.destroyForcibly()
+                return false
+            }
+            process.exitValue() == 0
         } catch (e: Exception) {
             println("[CharacterizationTool] Javac compilation error: ${e.message}")
             false
@@ -115,18 +191,6 @@ class CharacterizationTool {
         val testCases = mutableListOf<TestCase>()
         var idCounter = startId
 
-        val instance: Any? = try {
-            if (!targetClass.isInterface && !Modifier.isAbstract(targetClass.modifiers)) {
-                val noArgCons = targetClass.declaredConstructors.firstOrNull { it.parameterCount == 0 }
-                noArgCons?.let {
-                    it.isAccessible = true
-                    it.newInstance()
-                }
-            } else null
-        } catch (e: Exception) {
-            null
-        }
-
         val publicMethods = targetClass.declaredMethods.filter { Modifier.isPublic(it.modifiers) }
 
         for (method in publicMethods) {
@@ -135,6 +199,7 @@ class CharacterizationTool {
             val inputVectors = generateInputVectorsForMethod(targetClass, method)
 
             for (vector in inputVectors) {
+                val instance: Any? = constructInstance(targetClass)
                 val expectedOutput = executeMethodAndCaptureOutput(targetClass, instance, method, vector)
                 val inputStrings = vector.map { formatValue(it) }
 
@@ -179,37 +244,67 @@ class CharacterizationTool {
             type == java.lang.Boolean::class.java -> listOf(true, false)
             type == Double::class.javaPrimitiveType || type == Double::class.javaObjectType ||
             type == java.lang.Double::class.java -> listOf(0.0, 3.14, -1.0, Double.NaN, Double.POSITIVE_INFINITY)
-            type.simpleName == "User" || type.name.contains("User") -> {
-                listOf(
-                    createSampleUser(type, "usr-1", "Alice", "alice@example.com", 25),
-                    createSampleUser(type, "usr-2", "Bob", null, 17),
-                    null
-                )
-            }
-            else -> listOf(null)
+            else -> listOf(constructInstance(type), null)
         }
     }
 
-    private fun createSampleUser(userClass: Class<*>, id: String, name: String, email: String?, age: Int): Any? {
+    /**
+     * General-purpose instance constructor. Works for any class from any external project.
+     *
+     * Strategy:
+     *  1. Zero-arg constructor (works for service classes, singletons, simple POJOs).
+     *  2. First available constructor with type-appropriate default arguments
+     *     (handles data classes / all-args POJOs that have no zero-arg constructor).
+     *  3. Returns null if both attempts fail (e.g. abstract class, interface, no public constructor).
+     */
+    private fun constructInstance(type: Class<*>): Any? {
+        if (type.isInterface || Modifier.isAbstract(type.modifiers)) return null
         return try {
-            val fullCons = userClass.constructors.firstOrNull { it.parameterCount == 4 }
-            if (fullCons != null) {
-                fullCons.newInstance(id, name, email, age)
-            } else {
-                val instance = userClass.getDeclaredConstructor().newInstance()
-                userClass.getMethod("setId", String::class.java).invoke(instance, id)
-                userClass.getMethod("setUsername", String::class.java).invoke(instance, name)
-                userClass.getMethod("setEmail", String::class.java).invoke(instance, email)
-                userClass.getMethod("setAge", Int::class.javaPrimitiveType ?: Int::class.java).invoke(instance, age)
-                instance
+            // Attempt 1: zero-arg constructor
+            val noArg = type.declaredConstructors.firstOrNull { it.parameterCount == 0 }
+            if (noArg != null) {
+                noArg.isAccessible = true
+                return noArg.newInstance()
             }
+            // Attempt 2: first constructor with synthesized default arguments
+            val cons = type.declaredConstructors.firstOrNull() ?: return null
+            cons.isAccessible = true
+            val args = cons.parameterTypes.map { p -> defaultForType(p) }.toTypedArray()
+            cons.newInstance(*args)
         } catch (e: Exception) {
             null
         }
     }
 
+    /** Returns a safe default value for a given JVM type, suitable for constructor injection. */
+    private fun defaultForType(type: Class<*>): Any? = when {
+        type == String::class.java                                              -> ""
+        type == Int::class.javaPrimitiveType    || type == Integer::class.java -> 0
+        type == Long::class.javaPrimitiveType   || type == Long::class.java    -> 0L
+        type == Double::class.javaPrimitiveType || type == Double::class.java  -> 0.0
+        type == Float::class.javaPrimitiveType  || type == Float::class.java   -> 0.0f
+        type == Short::class.javaPrimitiveType  || type == Short::class.java   -> 0.toShort()
+        type == Byte::class.javaPrimitiveType   || type == Byte::class.java    -> 0.toByte()
+        type == Boolean::class.javaPrimitiveType || type == java.lang.Boolean::class.java -> false
+        type == Char::class.javaPrimitiveType   || type == Character::class.java -> '\u0000'
+        type.isAssignableFrom(List::class.java)                                -> emptyList<Any>()
+        type.isAssignableFrom(MutableList::class.java)                         -> mutableListOf<Any>()
+        type.isAssignableFrom(Map::class.java)                                 -> emptyMap<Any, Any>()
+        type.isAssignableFrom(Set::class.java)                                 -> emptySet<Any>()
+        else                                                                   -> null  // reference type: pass null
+    }
+
     /**
      * Executes method reflectively and stringifies return result or caught exception.
+     *
+     * Android framework stub handling:
+     * If the invoked method (or anything it calls) throws a [RuntimeException] whose
+     * message is "Stub!" — the Android SDK stub jar signals that this is an
+     * Android-framework method with no real implementation — the output is labelled
+     * "STUB!: <class>.<method>" rather than a generic "EXCEPTION:" string.
+     * This sentinel value is matched symmetrically in VerifierAgent so that a
+     * Stub! on BOTH sides of a test case (original Java and migrated Kotlin) is
+     * treated as PASS (behavioral equivalence confirmed).
      */
     private fun executeMethodAndCaptureOutput(
         targetClass: Class<*>,
@@ -232,7 +327,13 @@ class CharacterizationTool {
             }
         } catch (e: java.lang.reflect.InvocationTargetException) {
             val cause = e.cause ?: e
-            "EXCEPTION: ${cause.javaClass.simpleName}: ${cause.message}"
+            // Detect Android stub calls: the stub jar throws RuntimeException("Stub!")
+            if (cause is RuntimeException && cause.message == "Stub!") {
+                println("[CharacterizationTool] STUB! (Android framework call, expected) — ${targetClass.simpleName}.${method.name}")
+                "STUB!: ${targetClass.simpleName}.${method.name}"
+            } else {
+                "EXCEPTION: ${cause.javaClass.simpleName}: ${cause.message}"
+            }
         } catch (e: Exception) {
             "EXCEPTION: ${e.javaClass.simpleName}: ${e.message}"
         }

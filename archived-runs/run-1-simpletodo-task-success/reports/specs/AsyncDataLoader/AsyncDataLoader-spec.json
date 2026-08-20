@@ -1,0 +1,20 @@
+{
+    "className": "AsyncDataLoader",
+    "packageName": "com.example.legacy",
+    "imports": [
+        "java.util.concurrent.ExecutorService",
+        "java.util.concurrent.Executors"
+    ],
+    "fields": [
+        "ExecutorService executor"
+    ],
+    "methods": [
+        "public void loadUserData(String userId, DataCallback<User> callback)",
+        "public void shutdown()"
+    ],
+    "dependsOn": [
+        "User"
+    ],
+    "businessLogicSummary": "**AsyncDataLoader** — `com.example.legacy`\n\n**Depends on:** User\n**Fields (1):** ExecutorService executor\n**Methods (2):**\n  - `public void loadUserData(String userId, DataCallback<User> callback)`\n  - `public void shutdown()`\n\n*(AST-only summary — LLM unavailable)*\n",
+    "sourceFilePath": "D:\\Projects\\Apollo-agent\\sample-legacy\\src\\main\\java\\com\\example\\legacy\\AsyncDataLoader.java"
+}

@@ -59,7 +59,7 @@ class AnalyzerToolSet(private val astTool: JavaAstTool) : ToolSet {
  */
 class AnalyzerAgent(
     private val astTool: JavaAstTool = JavaAstTool(),
-    private val reportsDir: File = File("reports")
+    private val reportsDir: File = File("").absoluteFile.resolve("reports")
 ) {
 
     // ── Prompt executor (lazy — avoids connecting at construction time) ────────
@@ -71,52 +71,27 @@ class AnalyzerAgent(
 
     /**
      * Build an [OpenAILLMClient] pointing at the right base URL for the
-     * configured provider.  Both Gemini and Groq expose OpenAI-compatible
+     * configured provider.  Both Groq and Ollama expose OpenAI-compatible
      * Chat-Completions endpoints so we can reuse the same client class.
      */
     private fun buildOpenAICompatibleClient(): OpenAILLMClient {
-        val (apiKey, baseUrl, chatPath) = when (LlmConfig.defaultProvider) {
-            ApolloProvider.GEMINI ->
-                Triple(
-                    LlmConfig.geminiApiKey,
-                    "https://generativelanguage.googleapis.com",
-                    "v1beta/openai/chat/completions"
-                )
-            ApolloProvider.GROQ ->
-                Triple(
-                    LlmConfig.groqApiKey,
-                    "https://api.groq.com",
-                    "openai/v1/chat/completions"
-                )
-        }
         val settings = OpenAIClientSettings(
-            /* baseUrl              */ baseUrl,
+            /* baseUrl              */ LlmConfig.ollamaBaseUrl,
             /* timeoutConfig        */ ai.koog.prompt.executor.clients.ConnectionTimeoutConfig(),
-            /* chatCompletionsPath  */ chatPath,
+            /* chatCompletionsPath  */ "chat/completions",
             /* responsesAPIPath     */ "v1/responses",
             /* embeddingsPath       */ "v1/embeddings",
             /* moderationsPath      */ "v1/moderations",
             /* modelsPath           */ "v1/models"
         )
-        return OpenAILLMClient(apiKey = apiKey, settings = settings)
+        return OpenAILLMClient(apiKey = LlmConfig.ollamaApiKey, settings = settings)
     }
 
-    /**
-     * Dynamically build an [LLModel] that maps our config string to whatever
-     * model the endpoint understands. We wrap it in a simple [LLModel] that
-     * exposes only Chat-Completions capabilities (the common denominator for
-     * Gemini-OpenAI-compat and Groq).
-     */
     private val llModel: LLModel
         get() {
-            val modelId = when (LlmConfig.defaultProvider) {
-                ApolloProvider.GEMINI -> LlmConfig.defaultModel.ifBlank { "gemini-2.5-flash" }
-                ApolloProvider.GROQ   -> LlmConfig.defaultModel.ifBlank { "llama-3.3-70b-versatile" }
-            }
-            // LLModel is a data class in Koog 1.0.0 — instantiate directly.
             return LLModel(
                 provider = LLMProvider.OpenAI,
-                id = modelId,
+                id = LlmConfig.ollamaModel,
                 capabilities = listOf(
                     LLMCapability.Completion,
                     LLMCapability.Temperature,
@@ -162,34 +137,22 @@ class AnalyzerAgent(
             println("[AnalyzerAgent]   → Summarizing: $className")
 
             var summary = ""
-            var attempt = 0
-            var success = false
-            while (attempt < 3 && !success) {
-                attempt++
-                try {
-                    summary = callLlmForSummary(spec, deps)
-                    success = true
-                } catch (e: Exception) {
-                    val msg = e.message ?: ""
-                    if (LlmConfig.isConfigOr404Error(e)) {
-                        System.err.println("==========================================================================")
-                        System.err.println("⚠️ LOUD WARNING [AnalyzerAgent]: LLM CONFIG / MODEL NOT FOUND ERROR for '$className'!")
-                        System.err.println("   Details: ${e.message}")
-                        System.err.println("   Falling back to AST summary. Flagging usedFallbackDueToConfigError = true")
-                        System.err.println("==========================================================================")
-                        configErrorModules.add(className)
-                        summary = buildFallbackSummary(spec, deps)
-                        break
-                    } else if ((msg.contains("429") || msg.contains("rate limit", ignoreCase = true) || msg.contains("RESOURCE_EXHAUSTED", ignoreCase = true)) && attempt < 3) {
-                        System.err.println("[AnalyzerAgent] 429 Rate limit encountered for $className (attempt $attempt/3). Waiting 15s before retry...")
-                        try { Thread.sleep(15000) } catch (ignored: Exception) {}
-                    } else {
-                        System.err.println("[AnalyzerAgent] Transient LLM error for $className: ${e.message}. Using AST summary fallback.")
-                        transientErrorModules.add(className)
-                        summary = buildFallbackSummary(spec, deps)
-                        break
-                    }
+            try {
+                summary = callLlmForSummary(spec, deps)
+            } catch (e: Exception) {
+                val msg = e.message ?: ""
+                if (LlmConfig.isConfigOr404Error(e)) {
+                    System.err.println("==========================================================================")
+                    System.err.println("⚠️ LOUD WARNING [AnalyzerAgent]: LLM CONFIG / MODEL NOT FOUND ERROR for '$className'!")
+                    System.err.println("   Details: ${e.message}")
+                    System.err.println("   Falling back to AST summary. Flagging usedFallbackDueToConfigError = true")
+                    System.err.println("==========================================================================")
+                    configErrorModules.add(className)
+                } else {
+                    System.err.println("[AnalyzerAgent] LLM failed for $className across providers: $msg. Using AST summary fallback.")
+                    transientErrorModules.add(className)
                 }
+                summary = buildFallbackSummary(spec, deps)
             }
 
             val moduleSpec = astTool.toModuleSpec(spec, deps, summary)
@@ -256,11 +219,6 @@ class AnalyzerAgent(
 
     // ── LLM call via Koog AIAgent ─────────────────────────────────────────────
 
-    /**
-     * Construct a Koog [AIAgent] for a single summarization turn and run it
-     * synchronously. Uses Koog's default `singleRunStrategy` (the no-arg
-     * `AIAgent(promptExecutor, llmModel, …)` factory).
-     */
     private fun callLlmForSummary(spec: JavaClassSpec, deps: List<String>): String {
         val systemPrompt = """
             You are a senior Java architect helping with a Java-to-Kotlin migration.
@@ -270,20 +228,11 @@ class AnalyzerAgent(
         """.trimIndent()
 
         val userPrompt = buildSummarizationPrompt(spec, deps)
-
-        val agent = AIAgent(
-            promptExecutor = promptExecutor,
-            llmModel       = llModel,
-            toolRegistry   = ToolRegistry {
-                tools(AnalyzerToolSet(astTool))
-            },
-            systemPrompt    = systemPrompt,
-            temperature     = 0.1,
-            maxIterations   = 3
-        )
-
-        return runBlocking {
-            agent.run(userPrompt) ?: buildFallbackSummary(spec, deps)
+        return try {
+            LlmConfig.callLlmWithFallback(userPrompt, systemPrompt, temperature = 0.1, moduleName = spec.className)
+        } catch (e: Exception) {
+            println("[AnalyzerAgent] LLM call failed for ${spec.className}: ${e.message}. Using AST fallback.")
+            buildFallbackSummary(spec, deps)
         }
     }
 

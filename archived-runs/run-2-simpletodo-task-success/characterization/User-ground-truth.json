@@ -1,0 +1,242 @@
+[
+    {
+        "testId": "TC-41",
+        "className": "User",
+        "methodName": "getUsername",
+        "inputs": [],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-42",
+        "className": "User",
+        "methodName": "getEmail",
+        "inputs": [],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-43",
+        "className": "User",
+        "methodName": "getAge",
+        "inputs": [],
+        "expectedOutput": "0"
+    },
+    {
+        "testId": "TC-44",
+        "className": "User",
+        "methodName": "equals",
+        "inputs": [
+            "java.lang.Object@16f0ec18"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-45",
+        "className": "User",
+        "methodName": "equals",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-46",
+        "className": "User",
+        "methodName": "toString",
+        "inputs": [],
+        "expectedOutput": "User{id='null', username='null', email='null', age=0}"
+    },
+    {
+        "testId": "TC-47",
+        "className": "User",
+        "methodName": "hashCode",
+        "inputs": [],
+        "expectedOutput": "923521"
+    },
+    {
+        "testId": "TC-48",
+        "className": "User",
+        "methodName": "getId",
+        "inputs": [],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-49",
+        "className": "User",
+        "methodName": "setId",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-50",
+        "className": "User",
+        "methodName": "setId",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-51",
+        "className": "User",
+        "methodName": "setId",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-52",
+        "className": "User",
+        "methodName": "setId",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-53",
+        "className": "User",
+        "methodName": "setId",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-54",
+        "className": "User",
+        "methodName": "setUsername",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-55",
+        "className": "User",
+        "methodName": "setUsername",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-56",
+        "className": "User",
+        "methodName": "setUsername",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-57",
+        "className": "User",
+        "methodName": "setUsername",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-58",
+        "className": "User",
+        "methodName": "setUsername",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-59",
+        "className": "User",
+        "methodName": "setEmail",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-60",
+        "className": "User",
+        "methodName": "setEmail",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-61",
+        "className": "User",
+        "methodName": "setEmail",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-62",
+        "className": "User",
+        "methodName": "setEmail",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-63",
+        "className": "User",
+        "methodName": "setEmail",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-64",
+        "className": "User",
+        "methodName": "setAge",
+        "inputs": [
+            "25"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-65",
+        "className": "User",
+        "methodName": "setAge",
+        "inputs": [
+            "0"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-66",
+        "className": "User",
+        "methodName": "setAge",
+        "inputs": [
+            "17"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-67",
+        "className": "User",
+        "methodName": "setAge",
+        "inputs": [
+            "-1"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-68",
+        "className": "User",
+        "methodName": "setAge",
+        "inputs": [
+            "2147483647"
+        ],
+        "expectedOutput": "null"
+    }
+]

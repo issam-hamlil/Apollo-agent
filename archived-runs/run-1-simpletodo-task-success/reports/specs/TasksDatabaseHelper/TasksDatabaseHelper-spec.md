@@ -1,0 +1,35 @@
+# Module Spec: TasksDatabaseHelper
+
+| Property | Value |
+|----------|-------|
+| **Package** | `com.clinton.simpletodo.utils` |
+| **Source** | `D:\Projects\projects-to-test-on\SimpleToDo\app\src\main\java\com\clinton\simpletodo\utils\TasksDatabaseHelper.java` |
+| **Depends On** | `Task`, `TaskContract` |
+
+## Fields
+- `String TAG`
+- `String DATABASE_NAME`
+- `int DATABASE_VERSION`
+
+## Methods
+- `public void onConfigure(SQLiteDatabase db)`
+- `public void onCreate(SQLiteDatabase db)`
+- `public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)`
+- `public void addTask(String task)`
+- `public long addOrUpdateTask(Task task)`
+- `public ArrayList<String> getAllTasks()`
+- `public void deleteAllTasks()`
+
+## Business Logic Summary
+
+1. **Purpose** 
+The TasksDatabaseHelper class is responsible for managing a SQLite database to store tasks, providing methods for adding, retrieving, and deleting tasks. It extends the SQLiteOpenHelper class to handle database creation and upgrades.
+
+2. **Core Logic** 
+The core logic of this class revolves around creating and managing a tasks table in the database, with methods to add new tasks, retrieve all tasks, and delete tasks. It uses SQLite queries to perform these operations, and it also handles database upgrades by dropping the existing table and recreating it when the database version changes.
+
+3. **Migration Notes** 
+When migrating this class to Kotlin, several improvements can be made. For instance, the use of Kotlin's null safety features can help prevent NullPointerExceptions. Additionally, Kotlin's extension functions and data classes can simplify the code and make it more concise. The Task class can be replaced with a Kotlin data class, and the database operations can be made more efficient using Kotlin's coroutines and suspend functions.
+
+4. **Dependencies** 
+This class relies on the Task and TaskContract classes from the repo, which are used to define the structure of the tasks table in the database. It also uses the SQLiteOpenHelper class from the Android SDK to manage the database.

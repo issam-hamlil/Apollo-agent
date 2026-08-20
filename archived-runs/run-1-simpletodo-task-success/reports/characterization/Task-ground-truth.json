@@ -1,0 +1,79 @@
+[
+    {
+        "testId": "TC-64",
+        "className": "Task",
+        "methodName": "getId",
+        "inputs": [],
+        "expectedOutput": "0"
+    },
+    {
+        "testId": "TC-65",
+        "className": "Task",
+        "methodName": "getText",
+        "inputs": [],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-66",
+        "className": "Task",
+        "methodName": "setText",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-67",
+        "className": "Task",
+        "methodName": "setText",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-68",
+        "className": "Task",
+        "methodName": "setText",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-69",
+        "className": "Task",
+        "methodName": "setText",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-70",
+        "className": "Task",
+        "methodName": "setText",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-71",
+        "className": "Task",
+        "methodName": "setId",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: IllegalArgumentException: null"
+    },
+    {
+        "testId": "TC-72",
+        "className": "Task",
+        "methodName": "setId",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: IllegalArgumentException: null"
+    }
+]

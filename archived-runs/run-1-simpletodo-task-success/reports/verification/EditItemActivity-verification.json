@@ -1,0 +1,29 @@
+{
+    "className": "EditItemActivity",
+    "totalTests": 20,
+    "passedTests": 0,
+    "failedTests": 20,
+    "status": "FAILED",
+    "failureDetails": [
+        "Test TC-1 (onOptionsItemSelected): expected 'STUB!: EditItemActivity.onOptionsItemSelected', got 'METHOD_NOT_FOUND: onOptionsItemSelected'",
+        "Test TC-2 (onOptionsItemSelected): expected 'STUB!: EditItemActivity.onOptionsItemSelected', got 'METHOD_NOT_FOUND: onOptionsItemSelected'",
+        "Test TC-3 (onCreateOptionsMenu): expected 'STUB!: EditItemActivity.onCreateOptionsMenu', got 'METHOD_NOT_FOUND: onCreateOptionsMenu'",
+        "Test TC-4 (onCreateOptionsMenu): expected 'STUB!: EditItemActivity.onCreateOptionsMenu', got 'METHOD_NOT_FOUND: onCreateOptionsMenu'",
+        "Test TC-5 (populateEditText): expected 'STUB!: EditItemActivity.populateEditText', got 'METHOD_NOT_FOUND: populateEditText'",
+        "Test TC-6 (populateEditText): expected 'STUB!: EditItemActivity.populateEditText', got 'METHOD_NOT_FOUND: populateEditText'",
+        "Test TC-7 (populateEditText): expected 'STUB!: EditItemActivity.populateEditText', got 'METHOD_NOT_FOUND: populateEditText'",
+        "Test TC-8 (populateEditText): expected 'STUB!: EditItemActivity.populateEditText', got 'METHOD_NOT_FOUND: populateEditText'",
+        "Test TC-9 (populateEditText): expected 'STUB!: EditItemActivity.populateEditText', got 'METHOD_NOT_FOUND: populateEditText'",
+        "Test TC-10 (onCancel): expected 'STUB!: EditItemActivity.onCancel', got 'METHOD_NOT_FOUND: onCancel'",
+        "Test TC-11 (onCancel): expected 'STUB!: EditItemActivity.onCancel', got 'METHOD_NOT_FOUND: onCancel'",
+        "Test TC-12 (onSave): expected 'STUB!: EditItemActivity.onSave', got 'METHOD_NOT_FOUND: onSave'",
+        "Test TC-13 (onSave): expected 'STUB!: EditItemActivity.onSave', got 'METHOD_NOT_FOUND: onSave'",
+        "Test TC-14 (preferredCase): expected 'Hello', got 'METHOD_NOT_FOUND: preferredCase'",
+        "Test TC-15 (preferredCase): expected '', got 'METHOD_NOT_FOUND: preferredCase'",
+        "Test TC-16 (preferredCase): expected '   ', got 'METHOD_NOT_FOUND: preferredCase'",
+        "Test TC-17 (preferredCase): expected 'Apollo', got 'METHOD_NOT_FOUND: preferredCase'",
+        "Test TC-18 (preferredCase): expected 'EXCEPTION: NullPointerException: Cannot invoke \"String.isEmpty()\" because \"<parameter1>\" is null', got 'METHOD_NOT_FOUND: preferredCase'",
+        "Test TC-19 (onSubmit): expected 'STUB!: EditItemActivity.onSubmit', got 'METHOD_NOT_FOUND: onSubmit'",
+        "Test TC-20 (onSubmit): expected 'STUB!: EditItemActivity.onSubmit', got 'METHOD_NOT_FOUND: onSubmit'"
+    ]
+}

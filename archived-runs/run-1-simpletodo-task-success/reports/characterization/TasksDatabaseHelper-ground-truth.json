@@ -1,0 +1,203 @@
+[
+    {
+        "testId": "TC-73",
+        "className": "TasksDatabaseHelper",
+        "methodName": "addTask",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-74",
+        "className": "TasksDatabaseHelper",
+        "methodName": "addTask",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-75",
+        "className": "TasksDatabaseHelper",
+        "methodName": "addTask",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-76",
+        "className": "TasksDatabaseHelper",
+        "methodName": "addTask",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-77",
+        "className": "TasksDatabaseHelper",
+        "methodName": "addTask",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-78",
+        "className": "TasksDatabaseHelper",
+        "methodName": "getAllTasks",
+        "inputs": [],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-79",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onConfigure",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-80",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onConfigure",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-81",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onUpgrade",
+        "inputs": [
+            "null",
+            "25",
+            "25"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-82",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onUpgrade",
+        "inputs": [
+            "null",
+            "25",
+            "0"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-83",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onUpgrade",
+        "inputs": [
+            "null",
+            "25",
+            "17"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-84",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onUpgrade",
+        "inputs": [
+            "null",
+            "25",
+            "-1"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-85",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onUpgrade",
+        "inputs": [
+            "null",
+            "25",
+            "2147483647"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-86",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onUpgrade",
+        "inputs": [
+            "null",
+            "0",
+            "25"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-87",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onUpgrade",
+        "inputs": [
+            "null",
+            "0",
+            "0"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-88",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onUpgrade",
+        "inputs": [
+            "null",
+            "0",
+            "17"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-89",
+        "className": "TasksDatabaseHelper",
+        "methodName": "addOrUpdateTask",
+        "inputs": [
+            "com.clinton.simpletodo.utils.TasksDatabaseHelper$Task@5478ce1e"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-90",
+        "className": "TasksDatabaseHelper",
+        "methodName": "addOrUpdateTask",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-91",
+        "className": "TasksDatabaseHelper",
+        "methodName": "deleteAllTasks",
+        "inputs": [],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-92",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onCreate",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    },
+    {
+        "testId": "TC-93",
+        "className": "TasksDatabaseHelper",
+        "methodName": "onCreate",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()"
+    }
+]

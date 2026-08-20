@@ -1,0 +1,118 @@
+[
+    {
+        "stageName": "STAGE_1_ANALYZER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-04T16:06:20.112558600Z",
+        "details": "Parsed 5 Java files.\nTopo order: StringUtils → TrickyMath → User → AsyncDataLoader → UserService\nSpecs written to: D:\\Projects\\Apollo-agent\\reports\\specs\n",
+        "metrics": {
+            "totalFiles": "5",
+            "totalDeps": "2",
+            "topologicalSize": "5",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_2_CHARACTERIZATION",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-04T16:06:22.445395200Z",
+        "details": "Captured 76 ground-truth test cases across legacy Java modules.",
+        "metrics": {
+            "totalTestCases": "76"
+        }
+    },
+    {
+        "stageName": "STAGE_3_MIGRATOR",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-04T16:07:02.289186700Z",
+        "details": "Migrated 5 Java files to Kotlin in dependency order. Saved to migrated-src.",
+        "metrics": {
+            "totalModulesMigrated": "5",
+            "outputDirectory": "D:\\Projects\\Apollo-agent\\migrated-src",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-04T16:07:13.233941300Z",
+        "details": "Kotlin compilation failed with 26 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "26"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-04T16:07:46.313402200Z",
+        "details": "Applied targeted fixes to 5 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "5",
+            "repairedModuleList": "StringUtils,TrickyMath,User,AsyncDataLoader,UserService",
+            "cappedModules": "0",
+            "retryIteration": "0",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-04T16:07:49.132785700Z",
+        "details": "Kotlin compilation failed with 22 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "22"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-04T16:08:22.902057100Z",
+        "details": "Applied targeted fixes to 5 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "5",
+            "repairedModuleList": "StringUtils,TrickyMath,User,AsyncDataLoader,UserService",
+            "cappedModules": "0",
+            "retryIteration": "1",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-04T16:08:24.920380800Z",
+        "details": "Kotlin compilation failed with 22 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "22"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-04T16:08:57.996185300Z",
+        "details": "Applied targeted fixes to 5 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "5",
+            "repairedModuleList": "StringUtils,TrickyMath,User,AsyncDataLoader,UserService",
+            "cappedModules": "0",
+            "retryIteration": "2",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-04T16:08:59.933843800Z",
+        "details": "Kotlin compilation failed with 19 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "19"
+        }
+    }
+]

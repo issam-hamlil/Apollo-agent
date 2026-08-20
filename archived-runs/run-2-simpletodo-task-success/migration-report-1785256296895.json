@@ -1,0 +1,43 @@
+[
+    {
+        "stageName": "STAGE_1_ANALYZER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-28T16:31:22.955989300Z",
+        "details": "Parsed 3 Java files.\nTopo order: StringUtils → User → UserService\nSpecs written to: D:\\Projects\\Apollo-agent\\reports\\specs\n",
+        "metrics": {
+            "totalFiles": "3",
+            "totalDeps": "1",
+            "topologicalSize": "3"
+        }
+    },
+    {
+        "stageName": "STAGE_2_CHARACTERIZATION",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-28T16:31:24.874711400Z",
+        "details": "Captured 48 characterization ground truth test cases across legacy Java modules.",
+        "metrics": {
+            "totalTestCases": "48"
+        }
+    },
+    {
+        "stageName": "STAGE_3_MIGRATOR",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-28T16:31:25.451475900Z",
+        "details": "Migrated 3 Java files to Kotlin in dependency order. Saved to migrated-src.",
+        "metrics": {
+            "totalModulesMigrated": "3",
+            "outputDirectory": "D:\\Projects\\Apollo-agent\\migrated-src"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-28T16:31:36.893473800Z",
+        "details": "All 48 ground-truth characterization test cases passed!",
+        "metrics": {
+            "testsPassed": "48",
+            "testsFailed": "0",
+            "allPassed": "true"
+        }
+    }
+]

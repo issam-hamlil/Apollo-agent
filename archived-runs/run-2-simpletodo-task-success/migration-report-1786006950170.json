@@ -1,0 +1,120 @@
+[
+    {
+        "stageName": "STAGE_1_ANALYZER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-06T08:59:25.858845300Z",
+        "details": "Parsed 6 Java files.\nTopo order: Task → TaskContract → TasksDatabaseHelper → EditItemActivity → MainActivity → SplashActivity\nSpecs written to: D:\\Projects\\Apollo-agent\\reports\\specs\n",
+        "metrics": {
+            "totalFiles": "6",
+            "totalDeps": "8",
+            "topologicalSize": "6",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_2_CHARACTERIZATION",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-06T08:59:28.388356500Z",
+        "details": "Captured 36 ground-truth test cases across legacy Java modules.",
+        "metrics": {
+            "totalTestCases": "36"
+        }
+    },
+    {
+        "stageName": "STAGE_3_MIGRATOR",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-06T09:00:10.483982100Z",
+        "details": "Migrated 6 Java files to Kotlin in dependency order. Saved to D:\\Projects\\Apollo-agent\\migrated-src. ⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for: MainActivity.",
+        "metrics": {
+            "totalModulesMigrated": "6",
+            "outputDirectory": "D:\\Projects\\Apollo-agent\\migrated-src",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "MainActivity"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-06T09:00:19.158518900Z",
+        "details": "Kotlin compilation failed with 346 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "346"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-06T09:01:02.197415200Z",
+        "details": "Applied targeted fixes to 6 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "6",
+            "repairedModuleList": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity",
+            "cappedModules": "0",
+            "retryIteration": "0",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-06T09:01:04.168869900Z",
+        "details": "Kotlin compilation failed with 452 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "452"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-06T09:01:46.572015500Z",
+        "details": "Applied targeted fixes to 6 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "6",
+            "repairedModuleList": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity",
+            "cappedModules": "0",
+            "retryIteration": "1",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-06T09:01:48.078937900Z",
+        "details": "Kotlin compilation failed with 443 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "443"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-06T09:02:28.866391900Z",
+        "details": "Applied targeted fixes to 6 module(s). 0 module(s) reached max retry cap (3). ⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for: TasksDatabaseHelper.",
+        "metrics": {
+            "repairedModules": "6",
+            "repairedModuleList": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity",
+            "cappedModules": "0",
+            "retryIteration": "2",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "TasksDatabaseHelper"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-06T09:02:30.164102Z",
+        "details": "Kotlin compilation failed with 443 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "443"
+        }
+    }
+]

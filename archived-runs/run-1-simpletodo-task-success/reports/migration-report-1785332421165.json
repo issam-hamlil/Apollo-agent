@@ -1,0 +1,123 @@
+[
+    {
+        "stageName": "STAGE_1_ANALYZER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:39:38.250025100Z",
+        "details": "Parsed 5 Java files.\nTopo order: StringUtils → TrickyMath → User → AsyncDataLoader → UserService\nTransient error fallback triggered for modules: StringUtils, TrickyMath, AsyncDataLoader, UserService\nSpecs written to: D:\\Projects\\Apollo-agent\\reports\\specs\n",
+        "metrics": {
+            "totalFiles": "5",
+            "totalDeps": "2",
+            "topologicalSize": "5",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "StringUtils,TrickyMath,AsyncDataLoader,UserService"
+        }
+    },
+    {
+        "stageName": "STAGE_2_CHARACTERIZATION",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:39:40.509979700Z",
+        "details": "Captured 76 ground-truth test cases across legacy Java modules.",
+        "metrics": {
+            "totalTestCases": "76"
+        }
+    },
+    {
+        "stageName": "STAGE_3_MIGRATOR",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:39:47.314289200Z",
+        "details": "Migrated 5 Java files to Kotlin in dependency order. Saved to migrated-src. Transient error fallback triggered for: User, AsyncDataLoader, UserService.",
+        "metrics": {
+            "totalModulesMigrated": "5",
+            "outputDirectory": "D:\\Projects\\Apollo-agent\\migrated-src",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "User,AsyncDataLoader,UserService"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-07-29T13:39:56.950175Z",
+        "details": "Kotlin compilation failed with 27 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "27"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:40:03.243085500Z",
+        "details": "Applied targeted fixes to 5 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "5",
+            "repairedModuleList": "StringUtils,TrickyMath,User,AsyncDataLoader,UserService",
+            "cappedModules": "0",
+            "retryIteration": "0",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "TrickyMath,User,UserService"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-07-29T13:40:05.455917300Z",
+        "details": "Kotlin compilation failed with 57 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "57"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:40:11.457608100Z",
+        "details": "Applied targeted fixes to 5 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "5",
+            "repairedModuleList": "StringUtils,TrickyMath,User,AsyncDataLoader,UserService",
+            "cappedModules": "0",
+            "retryIteration": "1",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "StringUtils,TrickyMath,User,AsyncDataLoader,UserService"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-07-29T13:40:13.128638100Z",
+        "details": "Kotlin compilation failed with 30 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "30"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:40:19.603629600Z",
+        "details": "Applied targeted fixes to 5 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "5",
+            "repairedModuleList": "StringUtils,TrickyMath,User,AsyncDataLoader,UserService",
+            "cappedModules": "0",
+            "retryIteration": "2",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "TrickyMath,User,AsyncDataLoader,UserService"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-07-29T13:40:21.155876100Z",
+        "details": "Kotlin compilation failed with 18 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "18"
+        }
+    }
+]

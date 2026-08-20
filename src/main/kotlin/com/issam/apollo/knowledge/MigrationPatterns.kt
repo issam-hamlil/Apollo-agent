@@ -57,15 +57,20 @@ class MigrationPatterns(private val kbFile: File = File("knowledge-base/java-to-
         val patterns = getAllPatterns()
         return patterns.filter { pattern ->
             when (pattern.category) {
-                "STRUCTURE" -> javaCode.contains("class") || javaCode.contains("interface") || javaCode.contains("getInstance")
+                "STRUCTURE" -> javaCode.contains("class") || javaCode.contains("interface") || javaCode.contains("getInstance") || javaCode.contains("SQLite") || javaCode.contains("Database")
                 "NULL_SAFETY" -> javaCode.contains("!= null") || javaCode.contains("== null") || javaCode.contains("Optional")
                 "SYNTAX" -> javaCode.contains("StringBuilder") || javaCode.contains("switch") || javaCode.contains("System.out.println") || javaCode.contains("get")
-                "COLLECTIONS" -> javaCode.contains("for (") || javaCode.contains("for(") || javaCode.contains("ArrayList") || javaCode.contains("List<")
+                "COLLECTIONS" -> javaCode.contains("for (") || javaCode.contains("for(") || javaCode.contains("ArrayList") || javaCode.contains("List<") || javaCode.contains("Set<") || javaCode.contains("HashSet")
                 "UTILITY" -> javaCode.contains("static") && javaCode.contains("class")
                 "CONCURRENCY_EVENTS" -> javaCode.contains("Thread") || javaCode.contains("AsyncTask") || javaCode.contains("Callback") || javaCode.contains("Listener")
                 "ASYNC/COROUTINES", "ASYNC_COROUTINES" -> javaCode.contains("Callback") || javaCode.contains("Listener") || javaCode.contains("Runnable") || javaCode.contains("Thread") || javaCode.contains("onSuccess") || javaCode.contains("onError")
-                "UI" -> javaCode.contains("Layout") || javaCode.contains("View") || javaCode.contains("<")
-                "RESOURCE_MANAGEMENT" -> javaCode.contains("try (") || javaCode.contains("try(") || javaCode.contains("Closeable")
+                "UI" -> javaCode.contains("Layout") || javaCode.contains("View") || javaCode.contains("<") || javaCode.contains("Activity") || javaCode.contains("findViewById") || javaCode.contains("Menu")
+                "RESOURCE_MANAGEMENT" -> javaCode.contains("try (") || javaCode.contains("try(") || javaCode.contains("Closeable") || javaCode.contains("File") || javaCode.contains("readLines") || javaCode.contains("writeLines")
+                // Ground-truth equivalence rules apply to every module - they describe how to
+                // preserve observable behaviour, not a syntactic construct to look for.
+                "BEHAVIORAL_EQUIVALENCE" -> true
+                "ANDROID_SQLITE" -> javaCode.contains("SQLite") || javaCode.contains("SQLiteOpenHelper") || javaCode.contains("Cursor") || javaCode.contains("ContentValues")
+                "ANDROID_UI" -> javaCode.contains("Activity") || javaCode.contains("Menu") || javaCode.contains("View") || javaCode.contains("Bundle")
                 else -> true
             }
         }

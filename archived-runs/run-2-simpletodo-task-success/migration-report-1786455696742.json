@@ -1,0 +1,147 @@
+[
+    {
+        "stageName": "STAGE_1_ANALYZER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T13:11:18.596931400Z",
+        "details": "Parsed 6 Java files.\nTopo order: Task → TaskContract → TasksDatabaseHelper → EditItemActivity → MainActivity → SplashActivity\nSpecs written to: D:\\Projects\\Apollo-agent\\reports\\specs\n",
+        "metrics": {
+            "totalFiles": "6",
+            "totalDeps": "8",
+            "topologicalSize": "6",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_2_CHARACTERIZATION",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T13:11:23.720132200Z",
+        "details": "Captured 93 ground-truth test cases across legacy Java modules.",
+        "metrics": {
+            "totalTestCases": "93"
+        }
+    },
+    {
+        "stageName": "STAGE_3_MIGRATOR",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T13:21:18.042837700Z",
+        "details": "Migrated 6 Java files to Kotlin in dependency order. Saved to D:\\Projects\\Apollo-agent\\migrated-src. Transient error fallback triggered for: TasksDatabaseHelper, EditItemActivity, MainActivity.",
+        "metrics": {
+            "totalModulesMigrated": "6",
+            "outputDirectory": "D:\\Projects\\Apollo-agent\\migrated-src",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "TasksDatabaseHelper,EditItemActivity,MainActivity"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-11T13:21:30.071918200Z",
+        "details": "84/93 characterization test cases failed.",
+        "metrics": {
+            "testsPassed": "9",
+            "testsFailed": "84",
+            "allPassed": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T13:28:01.210119100Z",
+        "details": "Applied targeted fixes to 5 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "5",
+            "repairedModuleList": "TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity",
+            "cappedModules": "0",
+            "retryIteration": "0",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "TasksDatabaseHelper,MainActivity"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-11T13:28:04.597003800Z",
+        "details": "Kotlin compilation failed with 23 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "23"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T13:34:50.016115700Z",
+        "details": "Applied targeted fixes to 6 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "6",
+            "repairedModuleList": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity",
+            "cappedModules": "0",
+            "retryIteration": "1",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "TasksDatabaseHelper,MainActivity"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-11T13:34:51.604654600Z",
+        "details": "Kotlin compilation failed with 23 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "23"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T13:41:06.607334Z",
+        "details": "Applied targeted fixes to 6 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "6",
+            "repairedModuleList": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity",
+            "cappedModules": "0",
+            "retryIteration": "2",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "TasksDatabaseHelper,MainActivity"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-11T13:41:08.058560900Z",
+        "details": "Kotlin compilation failed with 29 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "29"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T13:41:35.596774200Z",
+        "details": "Applied targeted fixes to 1 module(s). 5 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "1",
+            "repairedModuleList": "Task",
+            "cappedModules": "5",
+            "retryIteration": "3",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-11T13:41:36.733295400Z",
+        "details": "Kotlin compilation failed with 29 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "29"
+        }
+    }
+]

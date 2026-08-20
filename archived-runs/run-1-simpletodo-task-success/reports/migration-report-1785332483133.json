@@ -1,0 +1,128 @@
+[
+    {
+        "stageName": "STAGE_1_ANALYZER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:40:44.524300600Z",
+        "details": "Parsed 5 Java files.\nTopo order: StringUtils → TrickyMath → User → AsyncDataLoader → UserService\n⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for modules: StringUtils, TrickyMath, User, AsyncDataLoader, UserService\nSpecs written to: D:\\Projects\\Apollo-agent\\reports\\specs\n",
+        "metrics": {
+            "totalFiles": "5",
+            "totalDeps": "2",
+            "topologicalSize": "5",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "StringUtils,TrickyMath,User,AsyncDataLoader,UserService"
+        }
+    },
+    {
+        "stageName": "STAGE_2_CHARACTERIZATION",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:40:46.885750500Z",
+        "details": "Captured 76 ground-truth test cases across legacy Java modules.",
+        "metrics": {
+            "totalTestCases": "76"
+        }
+    },
+    {
+        "stageName": "STAGE_3_MIGRATOR",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:40:53.110116600Z",
+        "details": "Migrated 5 Java files to Kotlin in dependency order. Saved to migrated-src. ⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for: StringUtils. Transient error fallback triggered for: TrickyMath, User, AsyncDataLoader, UserService.",
+        "metrics": {
+            "totalModulesMigrated": "5",
+            "outputDirectory": "D:\\Projects\\Apollo-agent\\migrated-src",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "true",
+            "configErrorModules": "StringUtils",
+            "transientErrorModules": "TrickyMath,User,AsyncDataLoader,UserService"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-07-29T13:41:08.826214700Z",
+        "details": "22/76 characterization test cases failed.",
+        "metrics": {
+            "testsPassed": "54",
+            "testsFailed": "22",
+            "allPassed": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:41:11.121744300Z",
+        "details": "Applied targeted fixes to 2 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "2",
+            "repairedModuleList": "TrickyMath,AsyncDataLoader",
+            "cappedModules": "0",
+            "retryIteration": "0",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "TrickyMath,AsyncDataLoader"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-07-29T13:41:14.284500900Z",
+        "details": "22/76 characterization test cases failed.",
+        "metrics": {
+            "testsPassed": "54",
+            "testsFailed": "22",
+            "allPassed": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:41:16.584082700Z",
+        "details": "Applied targeted fixes to 2 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "2",
+            "repairedModuleList": "TrickyMath,AsyncDataLoader",
+            "cappedModules": "0",
+            "retryIteration": "1",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "TrickyMath,AsyncDataLoader"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-07-29T13:41:18.950588100Z",
+        "details": "22/76 characterization test cases failed.",
+        "metrics": {
+            "testsPassed": "54",
+            "testsFailed": "22",
+            "allPassed": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T13:41:21.282050500Z",
+        "details": "Applied targeted fixes to 2 module(s). 0 module(s) reached max retry cap (3).",
+        "metrics": {
+            "repairedModules": "2",
+            "repairedModuleList": "TrickyMath,AsyncDataLoader",
+            "cappedModules": "0",
+            "retryIteration": "2",
+            "usedFallbackDueToConfigError": "false",
+            "usedFallbackDueToTransientError": "true",
+            "transientErrorModules": "TrickyMath,AsyncDataLoader"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-07-29T13:41:23.127908400Z",
+        "details": "22/76 characterization test cases failed.",
+        "metrics": {
+            "testsPassed": "54",
+            "testsFailed": "22",
+            "allPassed": "false"
+        }
+    }
+]

@@ -1,0 +1,9 @@
+{
+    "className": "TaskContract",
+    "packageName": "com.clinton.simpletodo.utils",
+    "imports": [
+        "android.provider.BaseColumns"
+    ],
+    "businessLogicSummary": "1. **Purpose** — The `TaskContract` class defines the schema for a tasks table in an Android application's database, specifically providing constants for the table name and column names.\n\n2. **Core Logic** — None; this is a data contract class that serves as a blueprint for database interactions rather than containing any business logic or algorithms.\n\n3. **Migration Notes** — \n   - Use `object` instead of `class` to make it a singleton.\n   - Utilize Kotlin's string interpolation for better readability in defining constants.\n   - Consider using `const val` for compile-time constants like table and column names.\n\n4. **Dependencies** — Depends on the Android SDK, specifically the `BaseColumns` interface from `android.provider`.",
+    "sourceFilePath": "D:\\Projects\\projects-to-test-on\\SimpleToDo\\app\\src\\main\\java\\com\\clinton\\simpletodo\\utils\\TaskContract.java"
+}

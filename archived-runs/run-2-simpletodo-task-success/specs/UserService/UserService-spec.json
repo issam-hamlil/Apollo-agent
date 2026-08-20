@@ -1,0 +1,22 @@
+{
+    "className": "UserService",
+    "packageName": "com.example.legacy",
+    "imports": [
+        "java.util.ArrayList",
+        "java.util.List"
+    ],
+    "fields": [
+        "List<User> userList"
+    ],
+    "methods": [
+        "public void addUser(User user)",
+        "public User findById(String id)",
+        "public List<User> filterAdults()",
+        "public String formatUserSummary(User user)"
+    ],
+    "dependsOn": [
+        "User"
+    ],
+    "businessLogicSummary": "1. **Purpose**  \n   The `UserService` class is responsible for managing a list of users, providing operations to add users, find users by ID, filter adult users, and format user summaries.\n\n2. **Core Logic**  \n   - Adds users to an internal list after validating that the user and their ID are not null or empty.\n   - Searches for a user by ID in the list and returns the user if found.\n   - Filters the list of users to include only those who are 18 years old or older.\n   - Formats a summary string for a given user, handling potential null values for username and email.\n\n3. **Migration Notes**  \n   - Use Kotlin's `filter` and `map` functions for more concise collection operations.\n   - Utilize Kotlin's `let` or `apply` for safer null checks and object manipulations.\n   - Replace Java-style exception throwing with Kotlin's idiomatic approach using `requireNotNull`.\n\n4. **Dependencies**  \n   - Relies on the `User` class from the same repository, which is used to store user data.",
+    "sourceFilePath": "D:\\Projects\\Apollo-agent\\sample-legacy\\src\\main\\java\\com\\example\\legacy\\UserService.java"
+}

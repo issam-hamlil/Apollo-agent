@@ -1,0 +1,123 @@
+[
+    {
+        "stageName": "STAGE_1_ANALYZER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T10:19:12.306307900Z",
+        "details": "Parsed 6 Java files.\nTopo order: Task → TaskContract → TasksDatabaseHelper → EditItemActivity → MainActivity → SplashActivity\n⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for modules: TaskContract, TasksDatabaseHelper, EditItemActivity, MainActivity, SplashActivity\nSpecs written to: D:\\Projects\\Apollo-agent\\reports\\specs\n",
+        "metrics": {
+            "totalFiles": "6",
+            "totalDeps": "8",
+            "topologicalSize": "6",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity"
+        }
+    },
+    {
+        "stageName": "STAGE_2_CHARACTERIZATION",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T10:19:17.844465800Z",
+        "details": "Captured 93 ground-truth test cases across legacy Java modules.",
+        "metrics": {
+            "totalTestCases": "93"
+        }
+    },
+    {
+        "stageName": "STAGE_3_MIGRATOR",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T10:19:54.752960700Z",
+        "details": "Migrated 6 Java files to Kotlin in dependency order. Saved to D:\\Projects\\Apollo-agent\\migrated-src. ⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for: Task, TaskContract, TasksDatabaseHelper, EditItemActivity, MainActivity, SplashActivity.",
+        "metrics": {
+            "totalModulesMigrated": "6",
+            "outputDirectory": "D:\\Projects\\Apollo-agent\\migrated-src",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-11T10:20:04.032939900Z",
+        "details": "Kotlin compilation failed with 64 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "64"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T10:20:40.858070700Z",
+        "details": "Applied targeted fixes to 6 module(s). 0 module(s) reached max retry cap (3). ⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for: Task, TaskContract, TasksDatabaseHelper, EditItemActivity, MainActivity, SplashActivity.",
+        "metrics": {
+            "repairedModules": "6",
+            "repairedModuleList": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity",
+            "cappedModules": "0",
+            "retryIteration": "0",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-11T10:20:42.856639800Z",
+        "details": "Kotlin compilation failed with 64 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "64"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T10:21:19.491368300Z",
+        "details": "Applied targeted fixes to 6 module(s). 0 module(s) reached max retry cap (3). ⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for: Task, TaskContract, TasksDatabaseHelper, EditItemActivity, MainActivity, SplashActivity.",
+        "metrics": {
+            "repairedModules": "6",
+            "repairedModuleList": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity",
+            "cappedModules": "0",
+            "retryIteration": "1",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-11T10:21:20.352615Z",
+        "details": "Kotlin compilation failed with 64 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "64"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-08-11T10:21:58.887772200Z",
+        "details": "Applied targeted fixes to 6 module(s). 0 module(s) reached max retry cap (3). ⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for: Task, TaskContract, TasksDatabaseHelper, EditItemActivity, MainActivity, SplashActivity.",
+        "metrics": {
+            "repairedModules": "6",
+            "repairedModuleList": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity",
+            "cappedModules": "0",
+            "retryIteration": "2",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "Task,TaskContract,TasksDatabaseHelper,EditItemActivity,MainActivity,SplashActivity"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-08-11T10:22:00.439787700Z",
+        "details": "Kotlin compilation failed with 64 error(s).",
+        "metrics": {
+            "compiledSuccessfully": "false",
+            "errorCount": "64"
+        }
+    }
+]

@@ -1,0 +1,20 @@
+{
+    "className": "AsyncDataLoader",
+    "packageName": "com.example.legacy",
+    "imports": [
+        "java.util.concurrent.ExecutorService",
+        "java.util.concurrent.Executors"
+    ],
+    "fields": [
+        "ExecutorService executor"
+    ],
+    "methods": [
+        "public void loadUserData(String userId, DataCallback<User> callback)",
+        "public void shutdown()"
+    ],
+    "dependsOn": [
+        "User"
+    ],
+    "businessLogicSummary": "1. **Purpose** \nThe AsyncDataLoader class is responsible for loading user data asynchronously, allowing for non-blocking execution and providing a callback mechanism for handling the result. It manages an executor service to perform the data loading tasks.\n\n2. **Core Logic** \nThe core logic of this class involves submitting a task to the executor service to load user data based on a provided user ID, validating the user ID, and then creating a new User object to return via a callback interface, handling both success and error scenarios.\n\n3. **Migration Notes** \nIn migrating this class to Kotlin, several improvements could be made, such as utilizing Kotlin's coroutine support for asynchronous operations, which could replace the ExecutorService for a more idiomatic and potentially more efficient approach. Additionally, Kotlin's null safety features could simplify the null checks, and its data class feature could simplify the User class creation.\n\n4. **Dependencies** \nThis class has a dependency on the User class, which is assumed to be part of the repository, as indicated by the repo dependencies mention of User.",
+    "sourceFilePath": "D:\\Projects\\Apollo-agent\\sample-legacy\\src\\main\\java\\com\\example\\legacy\\AsyncDataLoader.java"
+}

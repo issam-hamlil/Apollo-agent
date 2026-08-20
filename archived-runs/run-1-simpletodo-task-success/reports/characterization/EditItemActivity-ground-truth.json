@@ -1,0 +1,182 @@
+[
+    {
+        "testId": "TC-1",
+        "className": "EditItemActivity",
+        "methodName": "onOptionsItemSelected",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.onOptionsItemSelected"
+    },
+    {
+        "testId": "TC-2",
+        "className": "EditItemActivity",
+        "methodName": "onOptionsItemSelected",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.onOptionsItemSelected"
+    },
+    {
+        "testId": "TC-3",
+        "className": "EditItemActivity",
+        "methodName": "onCreateOptionsMenu",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.onCreateOptionsMenu"
+    },
+    {
+        "testId": "TC-4",
+        "className": "EditItemActivity",
+        "methodName": "onCreateOptionsMenu",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.onCreateOptionsMenu"
+    },
+    {
+        "testId": "TC-5",
+        "className": "EditItemActivity",
+        "methodName": "populateEditText",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.populateEditText"
+    },
+    {
+        "testId": "TC-6",
+        "className": "EditItemActivity",
+        "methodName": "populateEditText",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.populateEditText"
+    },
+    {
+        "testId": "TC-7",
+        "className": "EditItemActivity",
+        "methodName": "populateEditText",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.populateEditText"
+    },
+    {
+        "testId": "TC-8",
+        "className": "EditItemActivity",
+        "methodName": "populateEditText",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.populateEditText"
+    },
+    {
+        "testId": "TC-9",
+        "className": "EditItemActivity",
+        "methodName": "populateEditText",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.populateEditText"
+    },
+    {
+        "testId": "TC-10",
+        "className": "EditItemActivity",
+        "methodName": "onCancel",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.onCancel"
+    },
+    {
+        "testId": "TC-11",
+        "className": "EditItemActivity",
+        "methodName": "onCancel",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.onCancel"
+    },
+    {
+        "testId": "TC-12",
+        "className": "EditItemActivity",
+        "methodName": "onSave",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.onSave"
+    },
+    {
+        "testId": "TC-13",
+        "className": "EditItemActivity",
+        "methodName": "onSave",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.onSave"
+    },
+    {
+        "testId": "TC-14",
+        "className": "EditItemActivity",
+        "methodName": "preferredCase",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "Hello"
+    },
+    {
+        "testId": "TC-15",
+        "className": "EditItemActivity",
+        "methodName": "preferredCase",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": ""
+    },
+    {
+        "testId": "TC-16",
+        "className": "EditItemActivity",
+        "methodName": "preferredCase",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "   "
+    },
+    {
+        "testId": "TC-17",
+        "className": "EditItemActivity",
+        "methodName": "preferredCase",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "Apollo"
+    },
+    {
+        "testId": "TC-18",
+        "className": "EditItemActivity",
+        "methodName": "preferredCase",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NullPointerException: Cannot invoke \"String.isEmpty()\" because \"<parameter1>\" is null"
+    },
+    {
+        "testId": "TC-19",
+        "className": "EditItemActivity",
+        "methodName": "onSubmit",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.onSubmit"
+    },
+    {
+        "testId": "TC-20",
+        "className": "EditItemActivity",
+        "methodName": "onSubmit",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: EditItemActivity.onSubmit"
+    }
+]

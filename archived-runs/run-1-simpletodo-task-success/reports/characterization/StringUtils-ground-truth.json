@@ -1,0 +1,92 @@
+[
+    {
+        "testId": "TC-10",
+        "className": "StringUtils",
+        "methodName": "isEmpty",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-11",
+        "className": "StringUtils",
+        "methodName": "isEmpty",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": "true"
+    },
+    {
+        "testId": "TC-12",
+        "className": "StringUtils",
+        "methodName": "isEmpty",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "true"
+    },
+    {
+        "testId": "TC-13",
+        "className": "StringUtils",
+        "methodName": "isEmpty",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-14",
+        "className": "StringUtils",
+        "methodName": "isEmpty",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "true"
+    },
+    {
+        "testId": "TC-15",
+        "className": "StringUtils",
+        "methodName": "capitalize",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "Hello"
+    },
+    {
+        "testId": "TC-16",
+        "className": "StringUtils",
+        "methodName": "capitalize",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": ""
+    },
+    {
+        "testId": "TC-17",
+        "className": "StringUtils",
+        "methodName": "capitalize",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "   "
+    },
+    {
+        "testId": "TC-18",
+        "className": "StringUtils",
+        "methodName": "capitalize",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "Apollo"
+    },
+    {
+        "testId": "TC-19",
+        "className": "StringUtils",
+        "methodName": "capitalize",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "null"
+    }
+]

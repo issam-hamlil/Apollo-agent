@@ -1,0 +1,17 @@
+{
+    "className": "SplashActivity",
+    "packageName": "com.clinton.simpletodo.activities",
+    "imports": [
+        "android.content.Intent",
+        "android.os.Bundle",
+        "android.support.v7.app.AppCompatActivity"
+    ],
+    "methods": [
+        "void onCreate(Bundle savedInstanceState)"
+    ],
+    "dependsOn": [
+        "MainActivity"
+    ],
+    "businessLogicSummary": "1. **Purpose** — The `SplashActivity` is responsible for displaying a splash screen and immediately transitioning to the `MainActivity`.\n\n2. **Core Logic** — Upon creation, it launches an intent to start the `MainActivity` and then finishes itself.\n\n3. **Migration Notes** — In Kotlin, the class can be simplified using extension functions and more concise syntax. For example, `startActivity(intent)` can be replaced with `startActivity<MainActivity>()`.\n\n4. **Dependencies** — The class depends on the `MainActivity` for navigation after the splash screen is displayed.",
+    "sourceFilePath": "D:\\Projects\\projects-to-test-on\\SimpleToDo\\app\\src\\main\\java\\com\\clinton\\simpletodo\\activities\\SplashActivity.java"
+}

@@ -151,6 +151,102 @@
       "kotlinPattern": "suspend fun loadUserData(userId: String): User = suspendCancellableCoroutine { continuation -> ... }",
       "category": "ASYNC/COROUTINES",
       "description": "Transforms asynchronous callback listeners (onSuccess/onError) and Runnable thread patterns into clean Kotlin suspend functions or Flows."
+    },
+    {
+      "id": "findviewbyid-explicit-generic-type",
+      "name": "Explicit Generic Type Parameter for findViewById",
+      "javaPattern": "EditText etItem = (EditText) findViewById(R.id.etItem);",
+      "kotlinPattern": "val etItem = findViewById<EditText>(R.id.etItem)",
+      "category": "UI",
+      "description": "findViewById requires explicit generic type in Kotlin: findViewById<EditText>(R.id.foo), never bare findViewById(R.id.foo) assigned to a typed variable."
+    },
+    {
+      "id": "explicit-stdlib-imports",
+      "name": "Preserve and Add Explicit Stdlib Imports",
+      "javaPattern": "File file = new File(getFilesDir(), \"todo.txt\");\nSet<String> set = new HashSet<>();",
+      "kotlinPattern": "import java.io.File\nimport java.util.HashSet\n\nval file = File(filesDir, \"todo.txt\")\nval set: MutableSet<String> = HashSet()",
+      "category": "STRUCTURE",
+      "description": "Explicit imports for common Java stdlib classes (java.io.File, java.util.HashSet, etc.) must be preserved/added even when not present in original Java import list if used in translated logic."
+    },
+    {
+      "id": "shared-preferences-string-set-type",
+      "name": "SharedPreferences getStringSet Type Handling",
+      "javaPattern": "HashSet<String> items = (HashSet<String>) prefs.getStringSet(\"items\", new HashSet<String>());",
+      "kotlinPattern": "val set: Set<String>? = prefs.getStringSet(\"items\", null)\nval items: HashSet<String> = if (set != null) HashSet(set) else HashSet()",
+      "category": "COLLECTIONS",
+      "description": "SharedPreferences.getStringSet() returns MutableSet<String>, not HashSet<String> — wrap explicitly with HashSet(...) if the original Java code specifically typed it as HashSet."
+    },
+    {
+      "id": "support-lib-vs-androidx-imports",
+      "name": "Support Library vs AndroidX Dependency Alignment",
+      "javaPattern": "import android.support.v7.app.AppCompatActivity; // or androidx.appcompat.app.AppCompatActivity",
+      "kotlinPattern": "// When project uses AndroidX:\nimport androidx.appcompat.app.AppCompatActivity\n// When project uses legacy support library:\nimport android.support.v7.app.AppCompatActivity",
+      "category": "STRUCTURE",
+      "description": "Support library vs AndroidX: check the target project's actual build.gradle dependency (com.android.support vs androidx) before choosing which AppCompatActivity import to use — never emit both."
+    },
+    {
+      "id": "activity-view-member-properties",
+      "name": "Activity Views and State as Class Properties",
+      "javaPattern": "public class EditItemActivity extends AppCompatActivity {\n    EditText etEditItem;\n    int editItemIndex;\n    @Override protected void onCreate(Bundle b) {\n        setContentView(R.layout.activity_edit_item);\n        etEditItem = (EditText) findViewById(R.id.etTextToEdit);\n    }\n    public void onSave(View v) { ... }\n}",
+      "kotlinPattern": "open class EditItemActivity : AppCompatActivity() {\n    private lateinit var etEditItem: EditText\n    private var editItemIndex: Int = 0\n\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        setContentView(R.layout.activity_edit_item)\n        etEditItem = findViewById(R.id.etTextToEdit)\n    }\n\n    fun onSave(v: View?) {\n        val text = etEditItem.text.toString()\n        // ...\n    }\n}",
+      "category": "UI",
+      "description": "Declare Activity View references as class-level lateinit var or properties instead of local val inside onCreate so sibling methods (onSave, onCancel, populateEditText) can access them without nesting methods inside onCreate."
+    },
+    {
+      "id": "file-io-read-write-lines",
+      "name": "File Reading & Writing with Kotlin Stdlib Extensions",
+      "javaPattern": "File file = new File(getFilesDir(), \"todo.txt\");\nList<String> items = FileUtils.readLines(file);\nFileUtils.writeLines(file, items);",
+      "kotlinPattern": "val file = File(filesDir, \"todo.txt\")\n// Read lines safely:\nval items: ArrayList<String> = if (file.exists()) ArrayList(file.readLines()) else ArrayList()\n// Write lines:\nfile.writeText(items.joinToString(\"\\n\"))",
+      "category": "RESOURCE_MANAGEMENT",
+      "description": "Use Kotlin stdlib File extensions (file.readLines(), file.writeText()) to read and write text files cleanly without hallucinating static methods on SQLiteOpenHelper or requiring external Commons-IO libraries."
+    },
+    {
+      "id": "sqlite-cursor-extraction",
+      "name": "SQLite OpenHelper Cursor Query and Column Extraction",
+      "javaPattern": "public ArrayList<String> getAllTasks() {\n    ArrayList<String> tasks = new ArrayList<String>();\n    SQLiteDatabase db = this.getReadableDatabase();\n    Cursor cursor = db.rawQuery(\"SELECT * FROM tasks\", null);\n    try {\n        if (cursor.moveToFirst()) {\n            do {\n                tasks.add(cursor.getString(cursor.getColumnIndexOrThrow(\"task_text\")));\n            } while (cursor.moveToNext());\n        }\n    } finally { cursor.close(); }\n    return tasks;\n}",
+      "kotlinPattern": "fun getAllTasks(): ArrayList<String> {\n    val tasks = ArrayList<String>()\n    val db = readableDatabase\n    val cursor = db.rawQuery(\"SELECT * FROM \" + TaskContract.TaskEntry.TABLE_NAME, null)\n    try {\n        if (cursor.moveToFirst()) {\n            val titleIndex = cursor.getColumnIndexOrThrow(TaskContract.TaskEntry.COLUMN_NAME_TITLE)\n            do {\n                val text = cursor.getString(titleIndex)\n                if (text != null) tasks.add(text)\n            } while (cursor.moveToNext())\n        }\n    } finally {\n        cursor.close()\n    }\n    return tasks\n}",
+      "category": "STRUCTURE",
+      "description": "Ensure SQLite database queries match their declared return types (ArrayList<String> vs List<Task>) and use cursor.getColumnIndexOrThrow safely inside do-while loops."
+    },
+    {
+      "id": "activity-options-menu-inflation",
+      "name": "Activity Options Menu Inflation and Item Selection",
+      "javaPattern": "@Override public boolean onCreateOptionsMenu(Menu menu) {\n    getMenuInflater().inflate(R.menu.menu_main, menu);\n    return true;\n}\n@Override public boolean onOptionsItemSelected(MenuItem item) {\n    switch (item.getItemId()) {\n        case R.id.action_sort: doSort(); return true;\n        default: return super.onOptionsItemSelected(item);\n    }\n}",
+      "kotlinPattern": "override fun onCreateOptionsMenu(menu: Menu): Boolean {\n    menuInflater.inflate(R.menu.menu_main, menu)\n    return true\n}\n\noverride fun onOptionsItemSelected(item: MenuItem): Boolean {\n    return when (item.itemId) {\n        R.id.action_sort -> { doSort(); true }\n        else -> super.onOptionsItemSelected(item)\n    }\n}",
+      "category": "UI",
+      "description": "Implement Activity options menus with menuInflater.inflate using the authentic R.menu resource and handle item selection with when (item.itemId) expressions."
+    },
+    {
+      "id": "preserve-empty-and-blank-return-semantics",
+      "name": "Preserve Empty / Blank Return Semantics",
+      "javaPattern": "public static String preferredCase(String original) {\n    if (original.isEmpty())\n        return original;\n    return original.substring(0, 1).toUpperCase() + original.substring(1).toLowerCase();\n}",
+      "kotlinPattern": "fun preferredCase(original: String): String {\n    if (original.isEmpty()) return original\n    return original.substring(0, 1).uppercase() + original.substring(1).lowercase()\n}",
+      "category": "BEHAVIORAL_EQUIVALENCE",
+      "description": "A Java early-return guard such as `if (s.isEmpty()) return s;` returns the EMPTY STRING, not null. Do not convert it into a nullable return that yields null, and do not treat a blank string as empty. The return type stays non-null, and a blank input like '   ' is NOT empty, so it flows through the normal transformation path and comes back unchanged."
+    },
+    {
+      "id": "preserve-java-null-dereference-npe",
+      "name": "Preserve Java NullPointerException on Unchecked Parameters",
+      "javaPattern": "public static String preferredCase(String original) {\n    if (original.isEmpty())   // throws NullPointerException when original is null\n        return original;\n    ...\n}",
+      "kotlinPattern": "// Parameter stays NON-nullable so the same NullPointerException still escapes.\nfun preferredCase(original: String): String {\n    if (original.isEmpty()) return original\n    ...\n}\n\n// WRONG - silently swallows the exception the original threw:\n// fun preferredCase(original: String?): String? {\n//     if (original.isNullOrEmpty()) return null\n// }",
+      "category": "BEHAVIORAL_EQUIVALENCE",
+      "description": "When Java dereferences a parameter with no null check, passing null throws NullPointerException - that IS the characterized behaviour. Keep the Kotlin parameter non-nullable so the same exception escapes at the same point. Adding `?.`, `isNullOrEmpty()`, or `?: return null` makes the migrated code return a value where the original threw, which is a behavioural regression even though it looks safer."
+    },
+    {
+      "id": "sqliteopenhelper-context-constructor",
+      "name": "SQLiteOpenHelper Context Constructor",
+      "javaPattern": "public class TasksDatabaseHelper extends SQLiteOpenHelper {\n    public TasksDatabaseHelper(Context context) {\n        super(context, DATABASE_NAME, null, DATABASE_VERSION);\n    }\n}",
+      "kotlinPattern": "class TasksDatabaseHelper(context: Context) :\n    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {\n\n    companion object {\n        private const val DATABASE_NAME = \"tasksDatabase.db\"\n        private const val DATABASE_VERSION = 1\n    }\n}",
+      "category": "ANDROID_SQLITE",
+      "description": "Keep the single Context-taking constructor exactly as-is. Do NOT add a zero-argument constructor or default the Context parameter - the constructor signature is part of the characterized surface, and adding a no-arg overload changes how the class is instantiated reflectively. Database name and version become `const val` inside a companion object."
+    },
+    {
+      "id": "android-framework-methods-remain-stubs",
+      "name": "Android Framework Calls Stay Framework Calls",
+      "javaPattern": "@Override\npublic boolean onOptionsItemSelected(MenuItem item) {\n    return super.onOptionsItemSelected(item);\n}",
+      "kotlinPattern": "override fun onOptionsItemSelected(item: MenuItem): Boolean {\n    return super.onOptionsItemSelected(item)\n}",
+      "category": "ANDROID_UI",
+      "description": "Under the android.jar stub classpath every framework call throws RuntimeException(\"Stub!\"), and the verifier treats a stub on BOTH sides as equivalent. Keep delegating to super and keep the framework call in place. Do not replace it with a hand-written substitute or a hardcoded return value to make a test pass - that removes the stub and breaks the equivalence. Match the overridden signature exactly (e.g. `item: MenuItem`, not `item: MenuItem?`) or the override will not compile."
     }
   ]
 }

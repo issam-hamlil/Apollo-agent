@@ -1,0 +1,32 @@
+[
+    {
+        "stageName": "STAGE_1_ANALYZER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-28T16:08:52.428405500Z",
+        "details": "Parsed 3 Java files.\nTopo order: StringUtils → User → UserService\nSpecs written to: D:\\Projects\\Apollo-agent\\reports\\specs\n",
+        "metrics": {
+            "totalFiles": "3",
+            "totalDeps": "1",
+            "topologicalSize": "3"
+        }
+    },
+    {
+        "stageName": "STAGE_3_MIGRATOR",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-28T16:08:52.477692100Z",
+        "details": "Successfully transformed 3 Java files into modern Kotlin equivalents applying curated patterns.",
+        "metrics": {
+            "convertedFiles": "3"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-28T16:08:52.498023400Z",
+        "details": "Kotlin compilation verified successfully.",
+        "metrics": {
+            "compiled": "true",
+            "errorCount": "0"
+        }
+    }
+]

@@ -1,0 +1,22 @@
+{
+    "className": "UserService",
+    "packageName": "com.example.legacy",
+    "imports": [
+        "java.util.ArrayList",
+        "java.util.List"
+    ],
+    "fields": [
+        "List<User> userList"
+    ],
+    "methods": [
+        "public void addUser(User user)",
+        "public User findById(String id)",
+        "public List<User> filterAdults()",
+        "public String formatUserSummary(User user)"
+    ],
+    "dependsOn": [
+        "User"
+    ],
+    "businessLogicSummary": "**UserService** — `com.example.legacy`\n\n**Depends on:** User\n**Fields (1):** List<User> userList\n**Methods (4):**\n  - `public void addUser(User user)`\n  - `public User findById(String id)`\n  - `public List<User> filterAdults()`\n  - `public String formatUserSummary(User user)`\n\n*(AST-only summary — LLM unavailable)*\n",
+    "sourceFilePath": "D:\\Projects\\Apollo-agent\\sample-legacy\\src\\main\\java\\com\\example\\legacy\\UserService.java"
+}

@@ -1,0 +1,74 @@
+[
+    {
+        "stageName": "STAGE_1_ANALYZER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T10:48:26.542552200Z",
+        "details": "Parsed 5 Java files.\nTopo order: StringUtils → TrickyMath → User → AsyncDataLoader → UserService\n⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for modules: StringUtils, TrickyMath, User, AsyncDataLoader, UserService\nSpecs written to: D:\\Projects\\Apollo-agent\\reports\\specs\n",
+        "metrics": {
+            "totalFiles": "5",
+            "totalDeps": "2",
+            "topologicalSize": "5",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "StringUtils,TrickyMath,User,AsyncDataLoader,UserService"
+        }
+    },
+    {
+        "stageName": "STAGE_2_CHARACTERIZATION",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T10:48:28.819880900Z",
+        "details": "Captured 75 ground-truth test cases across legacy Java modules.",
+        "metrics": {
+            "totalTestCases": "75"
+        }
+    },
+    {
+        "stageName": "STAGE_3_MIGRATOR",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T10:48:29.564582100Z",
+        "details": "Migrated 5 Java files to Kotlin in dependency order. Saved to migrated-src. ⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for: StringUtils, TrickyMath, User, AsyncDataLoader, UserService.",
+        "metrics": {
+            "totalModulesMigrated": "5",
+            "outputDirectory": "D:\\Projects\\Apollo-agent\\migrated-src",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "StringUtils,TrickyMath,User,AsyncDataLoader,UserService"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "FAILED",
+        "timestamp": "2026-07-29T10:48:45.247930200Z",
+        "details": "7/75 characterization test cases failed.",
+        "metrics": {
+            "testsPassed": "68",
+            "testsFailed": "7",
+            "allPassed": "false"
+        }
+    },
+    {
+        "stageName": "STAGE_5_FIXER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T10:48:45.386850100Z",
+        "details": "Applied targeted fixes to 1 module(s). 0 module(s) reached max retry cap (3). ⚠️ CONFIG ERROR / MODEL NOT FOUND FALLBACK triggered for: TrickyMath.",
+        "metrics": {
+            "repairedModules": "1",
+            "cappedModules": "0",
+            "retryIteration": "0",
+            "usedFallbackDueToConfigError": "true",
+            "usedFallbackDueToTransientError": "false",
+            "configErrorModules": "TrickyMath"
+        }
+    },
+    {
+        "stageName": "STAGE_4_VERIFIER",
+        "status": "COMPLETED",
+        "timestamp": "2026-07-29T10:48:48.529020500Z",
+        "details": "All 75 ground-truth characterization test cases passed!",
+        "metrics": {
+            "testsPassed": "75",
+            "testsFailed": "0",
+            "allPassed": "true"
+        }
+    }
+]

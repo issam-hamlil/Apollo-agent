@@ -1,0 +1,11 @@
+{
+    "className": "TrickyMath",
+    "packageName": "com.example.legacy",
+    "methods": [
+        "public int safeAdd(int a, int b)",
+        "public String formatCurrency(double amount)",
+        "public boolean isBitSet(int number, int bitIndex)"
+    ],
+    "businessLogicSummary": "1. **Purpose** \nThe TrickyMath class is responsible for providing utility methods for mathematical operations, including safe integer addition, currency formatting, and bit manipulation. It serves as a helper class for various numerical tasks.\n\n2. **Core Logic** \nThe class encapsulates three main business rules: preventing integer overflow during addition, formatting double values as currency strings, and checking if a specific bit is set in an integer. These rules are implemented through methods that handle edge cases such as overflow, invalid numbers, and bit index validation.\n\n3. **Migration Notes** \nWhen migrating this class to Kotlin, consider utilizing Kotlin's idiomatic ways of handling null safety, and potentially using extension functions to add functionality to existing types. The safeAdd method could be replaced with Kotlin's built-in support for overflow handling, and the formatCurrency method might benefit from Kotlin's string interpolation. Additionally, the isBitSet method could be made more concise using Kotlin's bitwise operation syntax.\n\n4. **Dependencies** \nThis class does not appear to have any direct dependencies on other repository modules, as it only relies on Java's standard library for mathematical operations and string formatting. However, the migration to Kotlin might introduce dependencies on Kotlin standard library functions or other utility modules if needed for the migration process.",
+    "sourceFilePath": "D:\\Projects\\Apollo-agent\\sample-legacy\\src\\main\\java\\com\\example\\legacy\\TrickyMath.java"
+}

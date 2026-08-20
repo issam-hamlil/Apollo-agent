@@ -1,0 +1,413 @@
+[
+    {
+        "testId": "TC-21",
+        "className": "MainActivity",
+        "methodName": "removeElement",
+        "inputs": [
+            "hello",
+            "25"
+        ],
+        "expectedOutput": "STUB!: MainActivity.removeElement"
+    },
+    {
+        "testId": "TC-22",
+        "className": "MainActivity",
+        "methodName": "removeElement",
+        "inputs": [
+            "hello",
+            "0"
+        ],
+        "expectedOutput": "STUB!: MainActivity.removeElement"
+    },
+    {
+        "testId": "TC-23",
+        "className": "MainActivity",
+        "methodName": "removeElement",
+        "inputs": [
+            "hello",
+            "17"
+        ],
+        "expectedOutput": "STUB!: MainActivity.removeElement"
+    },
+    {
+        "testId": "TC-24",
+        "className": "MainActivity",
+        "methodName": "removeElement",
+        "inputs": [
+            "hello",
+            "-1"
+        ],
+        "expectedOutput": "STUB!: MainActivity.removeElement"
+    },
+    {
+        "testId": "TC-25",
+        "className": "MainActivity",
+        "methodName": "removeElement",
+        "inputs": [
+            "hello",
+            "2147483647"
+        ],
+        "expectedOutput": "STUB!: MainActivity.removeElement"
+    },
+    {
+        "testId": "TC-26",
+        "className": "MainActivity",
+        "methodName": "removeElement",
+        "inputs": [
+            "",
+            "25"
+        ],
+        "expectedOutput": "STUB!: MainActivity.removeElement"
+    },
+    {
+        "testId": "TC-27",
+        "className": "MainActivity",
+        "methodName": "removeElement",
+        "inputs": [
+            "",
+            "0"
+        ],
+        "expectedOutput": "STUB!: MainActivity.removeElement"
+    },
+    {
+        "testId": "TC-28",
+        "className": "MainActivity",
+        "methodName": "removeElement",
+        "inputs": [
+            "",
+            "17"
+        ],
+        "expectedOutput": "STUB!: MainActivity.removeElement"
+    },
+    {
+        "testId": "TC-29",
+        "className": "MainActivity",
+        "methodName": "preferredCase",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "Hello"
+    },
+    {
+        "testId": "TC-30",
+        "className": "MainActivity",
+        "methodName": "preferredCase",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": ""
+    },
+    {
+        "testId": "TC-31",
+        "className": "MainActivity",
+        "methodName": "preferredCase",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "   "
+    },
+    {
+        "testId": "TC-32",
+        "className": "MainActivity",
+        "methodName": "preferredCase",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "Apollo"
+    },
+    {
+        "testId": "TC-33",
+        "className": "MainActivity",
+        "methodName": "preferredCase",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NullPointerException: Cannot invoke \"String.isEmpty()\" because \"<parameter1>\" is null"
+    },
+    {
+        "testId": "TC-34",
+        "className": "MainActivity",
+        "methodName": "onOptionsItemSelected",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: MainActivity.onOptionsItemSelected"
+    },
+    {
+        "testId": "TC-35",
+        "className": "MainActivity",
+        "methodName": "onOptionsItemSelected",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: MainActivity.onOptionsItemSelected"
+    },
+    {
+        "testId": "TC-36",
+        "className": "MainActivity",
+        "methodName": "onCreateOptionsMenu",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: MainActivity.onCreateOptionsMenu"
+    },
+    {
+        "testId": "TC-37",
+        "className": "MainActivity",
+        "methodName": "onCreateOptionsMenu",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: MainActivity.onCreateOptionsMenu"
+    },
+    {
+        "testId": "TC-38",
+        "className": "MainActivity",
+        "methodName": "launchEditDialog",
+        "inputs": [
+            "hello",
+            "25"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditDialog"
+    },
+    {
+        "testId": "TC-39",
+        "className": "MainActivity",
+        "methodName": "launchEditDialog",
+        "inputs": [
+            "hello",
+            "0"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditDialog"
+    },
+    {
+        "testId": "TC-40",
+        "className": "MainActivity",
+        "methodName": "launchEditDialog",
+        "inputs": [
+            "hello",
+            "17"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditDialog"
+    },
+    {
+        "testId": "TC-41",
+        "className": "MainActivity",
+        "methodName": "launchEditDialog",
+        "inputs": [
+            "hello",
+            "-1"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditDialog"
+    },
+    {
+        "testId": "TC-42",
+        "className": "MainActivity",
+        "methodName": "launchEditDialog",
+        "inputs": [
+            "hello",
+            "2147483647"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditDialog"
+    },
+    {
+        "testId": "TC-43",
+        "className": "MainActivity",
+        "methodName": "launchEditDialog",
+        "inputs": [
+            "",
+            "25"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditDialog"
+    },
+    {
+        "testId": "TC-44",
+        "className": "MainActivity",
+        "methodName": "launchEditDialog",
+        "inputs": [
+            "",
+            "0"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditDialog"
+    },
+    {
+        "testId": "TC-45",
+        "className": "MainActivity",
+        "methodName": "launchEditDialog",
+        "inputs": [
+            "",
+            "17"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditDialog"
+    },
+    {
+        "testId": "TC-46",
+        "className": "MainActivity",
+        "methodName": "launchEditView",
+        "inputs": [
+            "hello",
+            "25"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditView"
+    },
+    {
+        "testId": "TC-47",
+        "className": "MainActivity",
+        "methodName": "launchEditView",
+        "inputs": [
+            "hello",
+            "0"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditView"
+    },
+    {
+        "testId": "TC-48",
+        "className": "MainActivity",
+        "methodName": "launchEditView",
+        "inputs": [
+            "hello",
+            "17"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditView"
+    },
+    {
+        "testId": "TC-49",
+        "className": "MainActivity",
+        "methodName": "launchEditView",
+        "inputs": [
+            "hello",
+            "-1"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditView"
+    },
+    {
+        "testId": "TC-50",
+        "className": "MainActivity",
+        "methodName": "launchEditView",
+        "inputs": [
+            "hello",
+            "2147483647"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditView"
+    },
+    {
+        "testId": "TC-51",
+        "className": "MainActivity",
+        "methodName": "launchEditView",
+        "inputs": [
+            "",
+            "25"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditView"
+    },
+    {
+        "testId": "TC-52",
+        "className": "MainActivity",
+        "methodName": "launchEditView",
+        "inputs": [
+            "",
+            "0"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditView"
+    },
+    {
+        "testId": "TC-53",
+        "className": "MainActivity",
+        "methodName": "launchEditView",
+        "inputs": [
+            "",
+            "17"
+        ],
+        "expectedOutput": "STUB!: MainActivity.launchEditView"
+    },
+    {
+        "testId": "TC-54",
+        "className": "MainActivity",
+        "methodName": "getArrayVal",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NullPointerException: Cannot invoke \"android.content.Context.getSharedPreferences(String, int)\" because \"<parameter1>\" is null"
+    },
+    {
+        "testId": "TC-55",
+        "className": "MainActivity",
+        "methodName": "getArrayVal",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NullPointerException: Cannot invoke \"android.content.Context.getSharedPreferences(String, int)\" because \"<parameter1>\" is null"
+    },
+    {
+        "testId": "TC-56",
+        "className": "MainActivity",
+        "methodName": "onAddItem",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: MainActivity.onAddItem"
+    },
+    {
+        "testId": "TC-57",
+        "className": "MainActivity",
+        "methodName": "onAddItem",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "STUB!: MainActivity.onAddItem"
+    },
+    {
+        "testId": "TC-58",
+        "className": "MainActivity",
+        "methodName": "storeArrayVal",
+        "inputs": [
+            "[]",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NullPointerException: Cannot invoke \"android.content.Context.getSharedPreferences(String, int)\" because \"<parameter2>\" is null"
+    },
+    {
+        "testId": "TC-59",
+        "className": "MainActivity",
+        "methodName": "storeArrayVal",
+        "inputs": [
+            "[]",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NullPointerException: Cannot invoke \"android.content.Context.getSharedPreferences(String, int)\" because \"<parameter2>\" is null"
+    },
+    {
+        "testId": "TC-60",
+        "className": "MainActivity",
+        "methodName": "storeArrayVal",
+        "inputs": [
+            "null",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NullPointerException: Cannot invoke \"java.util.Collection.size()\" because \"c\" is null"
+    },
+    {
+        "testId": "TC-61",
+        "className": "MainActivity",
+        "methodName": "storeArrayVal",
+        "inputs": [
+            "null",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: NullPointerException: Cannot invoke \"java.util.Collection.size()\" because \"c\" is null"
+    },
+    {
+        "testId": "TC-62",
+        "className": "MainActivity",
+        "methodName": "populateArrayItems",
+        "inputs": [],
+        "expectedOutput": "STUB!: MainActivity.populateArrayItems"
+    },
+    {
+        "testId": "TC-63",
+        "className": "MainActivity",
+        "methodName": "populateArrayItemsFromDb",
+        "inputs": [],
+        "expectedOutput": "STUB!: MainActivity.populateArrayItemsFromDb"
+    }
+]

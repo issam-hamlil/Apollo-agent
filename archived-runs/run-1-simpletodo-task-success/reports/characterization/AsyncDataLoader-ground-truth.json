@@ -1,0 +1,89 @@
+[
+    {
+        "testId": "TC-1",
+        "className": "AsyncDataLoader",
+        "methodName": "shutdown",
+        "inputs": [],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-2",
+        "className": "AsyncDataLoader",
+        "methodName": "loadUserData",
+        "inputs": [
+            "hello",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: RejectedExecutionException: Task java.util.concurrent.FutureTask@7e762feb[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@790e6eae[Wrapped task = com.example.legacy.AsyncDataLoader$$Lambda$2331/0x00000147c5c4ec10@2e48f0a1]] rejected from java.util.concurrent.ThreadPoolExecutor@911a6cd[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"
+    },
+    {
+        "testId": "TC-3",
+        "className": "AsyncDataLoader",
+        "methodName": "loadUserData",
+        "inputs": [
+            "hello",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: RejectedExecutionException: Task java.util.concurrent.FutureTask@250284ae[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@360c25f[Wrapped task = com.example.legacy.AsyncDataLoader$$Lambda$2331/0x00000147c5c4ec10@6ac4f76a]] rejected from java.util.concurrent.ThreadPoolExecutor@911a6cd[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"
+    },
+    {
+        "testId": "TC-4",
+        "className": "AsyncDataLoader",
+        "methodName": "loadUserData",
+        "inputs": [
+            "",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: RejectedExecutionException: Task java.util.concurrent.FutureTask@69e4e90b[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@21a1790d[Wrapped task = com.example.legacy.AsyncDataLoader$$Lambda$2331/0x00000147c5c4ec10@24d6355c]] rejected from java.util.concurrent.ThreadPoolExecutor@911a6cd[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"
+    },
+    {
+        "testId": "TC-5",
+        "className": "AsyncDataLoader",
+        "methodName": "loadUserData",
+        "inputs": [
+            "",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: RejectedExecutionException: Task java.util.concurrent.FutureTask@67d8e3b0[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@5872376d[Wrapped task = com.example.legacy.AsyncDataLoader$$Lambda$2331/0x00000147c5c4ec10@7231547f]] rejected from java.util.concurrent.ThreadPoolExecutor@911a6cd[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"
+    },
+    {
+        "testId": "TC-6",
+        "className": "AsyncDataLoader",
+        "methodName": "loadUserData",
+        "inputs": [
+            "   ",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: RejectedExecutionException: Task java.util.concurrent.FutureTask@18505320[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@293af2f1[Wrapped task = com.example.legacy.AsyncDataLoader$$Lambda$2331/0x00000147c5c4ec10@60ba61e4]] rejected from java.util.concurrent.ThreadPoolExecutor@911a6cd[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"
+    },
+    {
+        "testId": "TC-7",
+        "className": "AsyncDataLoader",
+        "methodName": "loadUserData",
+        "inputs": [
+            "   ",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: RejectedExecutionException: Task java.util.concurrent.FutureTask@7560ca1d[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@3835f6f9[Wrapped task = com.example.legacy.AsyncDataLoader$$Lambda$2331/0x00000147c5c4ec10@46663674]] rejected from java.util.concurrent.ThreadPoolExecutor@911a6cd[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"
+    },
+    {
+        "testId": "TC-8",
+        "className": "AsyncDataLoader",
+        "methodName": "loadUserData",
+        "inputs": [
+            "APOLLO",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: RejectedExecutionException: Task java.util.concurrent.FutureTask@f04b315[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@6f334ec2[Wrapped task = com.example.legacy.AsyncDataLoader$$Lambda$2331/0x00000147c5c4ec10@78a6ffe3]] rejected from java.util.concurrent.ThreadPoolExecutor@911a6cd[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"
+    },
+    {
+        "testId": "TC-9",
+        "className": "AsyncDataLoader",
+        "methodName": "loadUserData",
+        "inputs": [
+            "APOLLO",
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: RejectedExecutionException: Task java.util.concurrent.FutureTask@46611be4[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@7cc7a0ca[Wrapped task = com.example.legacy.AsyncDataLoader$$Lambda$2331/0x00000147c5c4ec10@977a4ce]] rejected from java.util.concurrent.ThreadPoolExecutor@911a6cd[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"
+    }
+]

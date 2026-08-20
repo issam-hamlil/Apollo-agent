@@ -2,295 +2,277 @@
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.3.21-7F52FF.svg?logo=kotlin)](https://kotlinlang.org/)
 [![JDK](https://img.shields.io/badge/JDK-17-ED8B00.svg?logo=openjdk)](https://openjdk.org/)
-[![Framework](https://img.shields.io/badge/Koog_AI-1.0.0-4285F4.svg)](https://github.com/)
-[![Protocol](https://img.shields.io/badge/MCP-Server_Supported-009688.svg)](https://modelcontextprotocol.io/)
+[![Architecture](https://img.shields.io/badge/Architecture-Stateful_Agentic_Graph-FF6F00.svg)](https://github.com/)
+[![Protocol](https://img.shields.io/badge/MCP-REST_HTTP_Service-009688.svg)](https://modelcontextprotocol.io/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**Apollo Agent** is a multi-stage, stateful agentic pipeline designed to autonomously transform legacy Java codebases into modern, idiomatic Kotlin. By combining static AST parsing, topological dependency resolution, reflective ground-truth characterization testing, LLM-based code synthesis, embedded Kotlin compilation, and self-healing repair loops, Apollo guarantees high-fidelity, compilable, and semantics-preserving migrations.
+**Apollo Agent** is an industrial-grade, multi-stage, stateful agentic system designed to autonomously modernize legacy Java codebases (including full Android applications and libraries) into clean, idiomatic Kotlin. 
+
+Unlike naive single-pass AI converters that produce broken, uncompilable code with hallucinated APIs, Apollo employs a **closed-loop verification and repair graph**. By orchestrating static AST parsing, topological dependency resolution, automated AAPT2 resource symbol compilation, dynamic AAR/JAR dependency fetching, reflective ground-truth characterization testing, two-tier model routing, embedded Kotlin compilation, and self-healing error recovery, Apollo guarantees semantic equivalence and guaranteed compilation.
+
+---
+
+## 📑 Table of Contents
+- [Architecture & Pipeline Workflow](#-architecture--pipeline-workflow)
+- [Comprehensive Stage-by-Stage Breakdown](#-comprehensive-stage-by-stage-breakdown)
+  - [Stage 0: Pre-Processor & Android Ecosystem](#0-stage-0--android-resource--dependency-pre-processor-aapt2tool--gradledependencyresolver)
+  - [Stage 1: Analyzer Agent](#1-stage-1--analyzer-agent-analyzeragent)
+  - [Stage 2: Characterization Tool](#2-stage-2--characterization-tool-characterizationtool)
+  - [Stage 3: Migrator Agent](#3-stage-3--migrator-agent-migratoragent)
+  - [Stage 4: Verifier Agent](#4-stage-4--verifier-agent-verifieragent)
+  - [Stage 5: Fixer Agent](#5-stage-5--fixer-agent-fixeragent)
+  - [Stage 6: Orchestrator & Resume Manager](#6-stage-6--orchestrator--resume-manager-modernizationgraph--resumemanager)
+- [Intelligent 2-Tier LLM Routing & Resilience](#-intelligent-2-tier-llm-routing--resilience)
+- [Android App & Framework Support](#-android-app--framework-support)
+- [MCP / REST HTTP Integration](#-mcp--rest-http-integration)
+- [Knowledge Base & Migration Patterns](#-knowledge-base--migration-patterns)
+- [Project Directory Structure](#-project-directory-structure)
+- [Setup & Environment Configuration](#-setup--environment-configuration)
+- [Running Apollo](#-running-apollo)
+- [Testing Guide & Verification Strategy](#-testing-guide--verification-strategy)
+- [License](#-license)
 
 ---
 
 ## 📐 Architecture & Pipeline Workflow
 
-Apollo operates as a 6-node stateful workflow graph (`ModernizationGraph`). Each stage transforms and updates a shared `GraphState` object, driving modules from discovery through verification.
+Apollo operates as a 6-node stateful workflow engine (`ModernizationGraph`). Execution state is passed through an immutable `GraphState` data model, transitioning code from discovery to final verification.
 
 ```mermaid
 flowchart TD
-    Start([Target Java Project]) --> Stage1[1. Analyzer Agent\nAST Parsing & Topo Sort]
-    Stage1 --> Stage2[2. Characterization Tool\nGround-Truth Test Vector Capture]
-    Stage2 --> Stage3[3. Migrator Agent\nTopological LLM Synthesis]
-    Stage3 --> Stage4[4. Verifier Agent\nEmbedded Compilation & Test Execution]
+    Start([Target Project: Pure Java or Android]) --> Stage0[Stage 0: Pre-Processor\nAAPT2 R.java & Dynamic AAR/JAR Resolution]
+    Stage0 --> Stage1[Stage 1: Analyzer Agent\nAST Parsing, Topo Sort & Spec Generation]
+    Stage1 --> Stage2[Stage 2: Characterization Tool\nGround-Truth Test Vector Capture]
+    Stage2 --> Stage3[Stage 3: Migrator Agent\nTopological LLM Synthesis using Tier-1 Model]
+    Stage3 --> Stage4[Stage 4: Verifier Agent\nEmbedded K2JVMCompiler & Sandboxed Execution]
     
-    Stage4 -->|Compilation Success & All Tests Passed| Stage6[6. Completed & Report Generation]
-    Stage4 -->|Compilation Failure OR Test Mismatch| Stage5[5. Fixer Agent\nSelf-Healing Repair Loop]
+    Stage4 -->|Compilation Success & Ground-Truth Passes| Stage6[Stage 6: Migration Report Generation & Export]
+    Stage4 -->|Compilation Errors OR Test Mismatches| Stage5{Stage 5: Fixer Agent\nSelf-Healing Repair Loop}
     
-    Stage5 -->|Max 3 Retries Per Module| Stage4
-    Stage5 -->|Retry Cap Reached| Stage6
+    Stage5 -->|Attempts 1..3: Tier-1 Primary Model| Stage4
+    Stage5 -->|Attempts 4+: Tier-2 Escalation Model| Stage4
+    Stage5 -->|5 Identical Errors OR Retry Cap Reached| Bottleneck([Flag Bottleneck & Halt])
     
-    Stage6 --> End([Generated Kotlin Code & Migration Reports])
+    Stage6 --> End([Generated Modern Kotlin Source Tree])
 ```
 
 ---
 
-## 🧩 Comprehensive Stage Breakdown
+## 🧩 Comprehensive Stage-by-Stage Breakdown
+
+### 0. 📦 Stage 0 — Android Resource & Dependency Pre-Processor (`Aapt2Tool` & `GradleDependencyResolver`)
+* **AAPT2 Resource Compilation**: For Android targets, executes Android SDK `aapt2 compile` and `aapt2 link` to produce an authentic `R.java` symbol file directly from XML layouts, strings, and drawables.
+* **Gradle Dependency Parsing**: Automatically scans `build.gradle`, `build.gradle.kts`, and `libs.versions.toml` to extract Maven coordinates for all project dependencies.
+* **Dynamic AAR/JAR Resolution**: Resolves remote artifacts (e.g., `androidx.appcompat`, `com.google.android.material`) via Maven Central and Google Maven, extracts nested `classes.jar` from `.aar` bundles, and populates the compilation classpath under `libs/android-stubs/androidx-cache/`.
 
 ### 1. 🔍 Stage 1 — Analyzer Agent (`AnalyzerAgent`)
-* **AST Analysis**: Uses JavaParser (`javaparser-symbol-solver-core`) to extract package declarations, imports, fields, methods, and cross-module dependencies.
-* **Topological Sort**: Executes Kahn's algorithm to resolve module dependencies into a topologically sorted migration order (`topologicalOrder`), ensuring dependency classes are migrated before dependent classes.
-* **LLM Summarization**: Invokes Koog `AIAgent` instances to generate structured business-logic summaries for each module.
-* **Artifact Generation**: Outputs per-module specification files (`.md` and `.json`) under `reports/specs/<ClassName>/` and writes `reports/topo-order.md`.
+* **AST Parsing**: Uses `javaparser-symbol-solver-core` to extract package declarations, class hierarchies, fields, methods, annotations, and inter-class dependencies.
+* **Topological Sort**: Executes Kahn's algorithm to resolve module dependencies into a strict DAG sequence (`topologicalOrder`), ensuring base models are migrated before dependent services and UI activities.
+* **Architectural Summarization**: Interacts with the LLM to generate comprehensive architectural specifications (`.md` and `.json`) detailing class contracts, state management, and business logic under `reports/specs/<ClassName>/`.
 
 ### 2. 🧪 Stage 2 — Characterization Tool (`CharacterizationTool`)
-* **Dynamic Compilation**: Compiles original legacy Java source files in-process using system `javac`.
-* **Input Vector Generation**: Dynamically constructs standard and edge-case input vectors (including `null`, empty strings, and boundary numbers).
-* **Reflective Execution**: Executes public methods of Java classes reflectively and captures baseline execution results and stringified exceptions.
-* **Ground-Truth Preservation**: Persists ground-truth test cases as JSON files in `reports/characterization/` to serve as verification benchmarks.
+* **Dynamic Java Compilation**: In-process compilation of original legacy Java source files using the system JDK `JavaCompiler`.
+* **Input Vector Generation**: Dynamically constructs boundary, nullability, empty collection, and numeric test vectors.
+* **Reflective Execution**: Reflectively executes all public methods, capturing return values and stringified exceptions.
+* **Ground-Truth Baseline**: Persists inputs and expected outputs as JSON files under `reports/characterization/<ClassName>-char-tests.json` to act as an unyielding behavioral benchmark for the migrated Kotlin code.
 
 ### 3. ⚙️ Stage 3 — Migrator Agent (`MigratorAgent`)
-* **Sequential Topological Migration**: Migrates modules strictly in dependency order to provide downstream modules with context from previously transformed Kotlin code.
-* **Context Synthesis**: Combines Java AST specs, raw Java source code, curated Knowledge Base migration patterns, and previously migrated Kotlin dependency source code into LLM prompts.
-* **Multi-LLM & Fallback**: Leverages Gemini 1.5/2.0 or Groq models via Koog framework, falling back to a rule-based Kotlin code generator when LLM providers are offline.
-* **Source Export**: Writes generated Kotlin code files to `migrated-src/<packagePath>/<ClassName>.kt`.
+* **Dependency-Aware Sequential Migration**: Synthesizes Kotlin code in topological order so that downstream modules have direct visibility into the newly migrated Kotlin implementations of their dependencies.
+* **Context Synthesis**: Injects the Java source, AST specifications, curated Knowledge Base patterns, and previously migrated Kotlin files into the migration prompt.
+* **Tier-1 Primary Model Usage**: Always utilizes the primary LLM (`OLLAMA_MODEL_PRIMARY=qwen3-coder:30b`) for initial transformations.
+* **File Output**: Writes generated code to `migrated-src/<packagePath>/<ClassName>.kt`.
 
 ### 4. ✅ Stage 4 — Verifier Agent (`VerifierAgent`)
-* **Embedded Compilation**: Compiles generated Kotlin files using Kotlin's embedded JVM compiler (`K2JVMCompiler`) in a sandboxed execution environment (`build/sandbox-compiled-kotlin`).
-* **Runtime Verification**: Dynamically loads compiled Kotlin classes into a custom `URLClassLoader` and executes Stage 2 ground-truth test vectors against them.
-* **Semantics Validation**: Compares actual Kotlin outputs against original Java baseline outputs, accounting for string formatting and POJO vs. Kotlin data class `toString` / `hashCode` differences.
+* **Embedded Kotlin Compiler**: Uses Kotlin's in-process `K2JVMCompiler` with sandboxed classpath isolation (`build/sandbox-compiled-kotlin`).
+* **Runtime Sandbox Execution**: Loads compiled Kotlin classes via custom `URLClassLoader` and executes Stage 2 ground-truth test vectors against them.
+* **Symmetric Validation**: Compares runtime outputs, gracefully handling data class string formatting differences and Android SDK `STUB!` sentinels.
+* **Per-Module Status Tracking**: Accurately tracks statuses (`VERIFIED`, `FAILED`, `PARTIAL`) per individual module rather than marking all modules failed if a single class fails.
 
 ### 5. 🛠️ Stage 5 — Fixer Agent (`FixerAgent`)
-* **Automated Self-Healing**: Triggered automatically when verification or compilation fails.
-* **Targeted Patching**: Feeds compiler diagnostic logs, characterization test failures, module specifications, and broken Kotlin code back into the LLM to generate surgical repairs.
-* **Loop Prevention**: Enforces a strict cap of **3 retries per module** (`regenCounters`). If a module reaches the retry limit, it is marked `FAILED` and pipeline execution completes without hanging.
+* **Diagnostic-Driven Patching**: Feeds exact Kotlin compiler error messages, line numbers, and characterization test diffs back to the LLM.
+* **Adaptive 2-Tier Model Routing**:
+  - **Attempts 0–2**: Uses Tier-1 Primary model (`qwen3-coder:30b`).
+  - **Attempts 3+**: Automatically falls back for that specific module to Tier-2 model (`qwen3.8:27b`).
+* **Intelligent Watchdogs**:
+  - **5-Identical-Error Watchdog**: If a module produces the identical compiler error 5 times in a row, the pipeline halts immediately and flags an LLM bottleneck to avoid burning compute.
+  - **3-Watchdog-Abort Watchdog**: If 3 LLM calls timeout consecutively, the process stops immediately.
 
-### 6. 📊 Stage 6 — Orchestrator & Reporting (`ModernizationGraph` & `Main.kt`)
-* **State Machine**: Orchestrates node transitions, state updates, and failure recovery paths across all agents.
-* **Report Generation**: Exports detailed JSON reports (`reports/migration-report-<timestamp>.json`) and a Markdown summary (`reports/migration-summary.md`) detailing per-module statuses, compile status, characterization test metrics, and retry counts.
+### 6. 📊 Stage 6 — Orchestrator & Resume Manager (`ModernizationGraph` & `ResumeManager`)
+* **Incremental Resume**: If a migration is restarted on a previously attempted project, Apollo automatically inspects existing artifacts (specs, characterization tests, Kotlin files, verification logs). If valid, it skips already-completed stages and resumes directly from the failed stage.
+* **Fresh Resume Budget**: Resets pipeline-level pass counts and per-module repair counters on resume so modules can benefit from newly updated Knowledge Base rules.
+* **Report Generation**: Exports detailed Markdown (`reports/migration-summary.md`) and JSON (`reports/migration-report-<timestamp>.json`) reports.
+* **Clean JVM Exit**: Executes `kotlin.system.exitProcess(0)` upon pipeline completion or bottleneck termination, preventing Gradle daemon hangs.
 
 ---
 
-## 🌐 Model Context Protocol (MCP) Integration
+## 🧠 Intelligent 2-Tier LLM Routing & Resilience
 
-Apollo includes a built-in **Model Context Protocol (MCP) Server** powered by Ktor Netty, allowing AI development environments (e.g., Cursor, Antigravity, Claude Desktop) to invoke Apollo tools remotely.
+Apollo uses a resilient, high-throughput LLM routing engine implemented in `LlmConfig.kt`:
 
-### Starting the MCP Server
+| Tier / Feature | Model / Target | Purpose & Behavior |
+| :--- | :--- | :--- |
+| **Tier 1 (Primary)** | `qwen3-coder:30b` | Specialized coding model used for all Stage 3 initial migrations and Fixer repair attempts 0 to 2. |
+| **Tier 2 (Fallback)** | `qwen3.8:27b` | Generalist fallback model automatically invoked when a module fails 3 consecutive repair attempts. |
+| **Instant-Trip Circuit Breaker** | Groq / Cloud API | Trips immediately on **any non-success response** (429 rate limit, 404, 500, network error) and locks out Groq for the remainder of the run. |
+| **Stream Watchdog** | Active Stream Closer | Terminates unresponsive HTTP streams and reader threads if an LLM fails to stream tokens within the configured timeout window. |
+
+---
+
+## 🤖 Android App & Framework Support
+
+Apollo natively handles complex Android applications (containing `Activity`, `View`, `SQLiteOpenHelper`, `BroadcastReceiver`, etc.):
+
+1. **Android SDK Resolution**: Automatically searches local environments for Android SDK platforms (`android-30` through `android-35`) and `aapt2`.
+2. **Android Stub Framework**: Employs `libs/android-stubs/android.jar` to provide compile-time symbols for all Android framework classes.
+3. **Symmetric Stub Validation**: When methods calling Android framework APIs throw `RuntimeException("Stub!")`, Apollo records a `STUB!` sentinel. If both Java baseline and migrated Kotlin yield `STUB!`, behavioral symmetry is confirmed as **PASS**.
+
+---
+
+## 🌐 MCP / REST HTTP Integration
+
+Apollo embeds a lightweight **Ktor Netty HTTP server** exposing migration tools for external AI IDEs (Cursor, Antigravity, Claude Desktop).
+
+### Starting the Server
 ```bash
 ./gradlew run --args="--server"
 ```
-*Port:* `8080` (default)
 
-### Server Endpoints
-
-#### `GET /mcp/tools`
-Returns the list of available MCP tools and JSON schemas.
-```json
-[
-  {
-    "name": "migrate_java_project",
-    "description": "Transforms a legacy Java codebase to modern Kotlin using Apollo agent stages",
-    "inputSchema": {
-      "type": "object",
-      "properties": {
-        "projectPath": { "type": "string" }
-      }
-    }
-  }
-]
-```
-
-#### `POST /mcp/execute`
-Executes the Apollo modernization pipeline on a target path.
-*Request Body:*
-```json
-{
-  "method": "migrate_java_project",
-  "projectPath": "sample-legacy"
-}
-```
-*Response Body:*
-```json
-{
-  "status": "SUCCESS",
-  "message": "Pipeline execution completed for sample-legacy",
-  "details": "Migrated 3 file(s) with 5 report entries."
-}
-```
+### Available Endpoints
+* `GET /health`: Liveness probe. Returns `{ "status": "UP", "service": "Apollo-MCP" }`.
+* `GET /mcp/tools`: Returns the catalog of callable tools.
+* `POST /mcp/execute`: Executes a tool (`analyze_repo`, `run_migration`, `get_job_status`, `get_module_report`, `list_migration_patterns`).
 
 ---
 
-## 📚 Knowledge Base (`MigrationPatterns`)
+## 📚 Knowledge Base & Migration Patterns
 
-Apollo utilizes a curated pattern database (`knowledge-base/java-to-kotlin-patterns.json`) to guide LLM transformations toward idiomatic Kotlin practices:
-
-| Pattern Category | Description & Applied Transformations |
-| :--- | :--- |
-| **`STRUCTURE`** | Converts Java POJOs with getters/setters/equals/hashCode into concise Kotlin `data class` constructs. |
-| **`UTILITY`** | Converts static utility classes with private constructors into Kotlin `object` singletons or extension functions. |
-| **`NULL_SAFETY`** | Replaces explicit `if (x != null)` checks with Elvis operators (`?:`), safe calls (`?.`), or `requireNotNull`. |
-| **`COLLECTIONS`** | Replaces legacy `for` loops and `ArrayList` mutations with Kotlin collection extensions (`filter`, `map`, `find`). |
-| **`RESOURCE_MANAGEMENT`** | Converts Java `try-with-resources` blocks into Kotlin `.use { }` scope calls. |
+The pattern repository (`knowledge-base/java-to-kotlin-patterns.json`) guides LLMs with curated before/after migration templates:
+* **`STRUCTURE`**: POJO $\rightarrow$ Kotlin `data class`.
+* **`UTILITY`**: Static utility class $\rightarrow$ Kotlin `object` singleton or top-level extension functions.
+* **`NULL_SAFETY`**: Explicit null checks $\rightarrow$ Elvis operators (`?:`), safe calls (`?.`), and `requireNotNull`.
+* **`ANDROID_UI`**: `findViewById` $\rightarrow$ ViewBinding / Synthetic property patterns.
+* **`SQLITE`**: `Cursor` and `SQLiteDatabase` raw queries $\rightarrow$ idiomatic `.use { }` blocks and extension queries.
 
 ---
 
-## 📁 Repository Directory Structure
+## 📁 Project Directory Structure
 
 ```
 Apollo-agent/
-├── build.gradle.kts                   # Gradle build configuration & dependencies
-├── settings.gradle.kts                # Project setting configurations
-├── .env                               # Environment variables (API keys, LLM providers)
+├── .env                               # LLM credentials & routing configuration
+├── build.gradle.kts                   # Kotlin 2.3.21 & Gradle build configuration
+├── PROJECT_INDEX.md                   # AI Assistant & Copilot Operational Index
 ├── knowledge-base/
-│   └── java-to-kotlin-patterns.json   # Curated Java-to-Kotlin migration pattern library
-├── sample-legacy/                     # Sample target Java application
+│   └── java-to-kotlin-patterns.json   # Curated migration pattern catalog
+├── sample-legacy/                     # Included Java testbed (5 legacy modules)
 │   └── src/main/java/com/example/legacy/
-│       ├── User.java                  # Java POJO class
-│       ├── StringUtils.java           # Static utility class
-│       └── UserService.java           # Service layer with business logic & state
+│       ├── User.java                  # Legacy POJO
+│       ├── StringUtils.java           # Static utility
+│       ├── TrickyMath.java            # Numeric boundary edge cases
+│       ├── AsyncDataLoader.java       # Callback-based async handler
+│       └── UserService.java           # Business service with mutable state
 ├── src/
 │   ├── main/kotlin/com/issam/apollo/
-│   │   ├── Main.kt                    # CLI entry point & console report renderer
-│   │   ├── agents/
-│   │   │   ├── AnalyzerAgent.kt       # Stage 1: AST parsing, topo sort & spec summarization
-│   │   │   ├── MigratorAgent.kt       # Stage 3: Topological Kotlin synthesis agent
-│   │   │   ├── VerifierAgent.kt       # Stage 4: Sandboxed compilation & test execution
-│   │   │   └── FixerAgent.kt          # Stage 5: Self-healing repair agent
-│   │   ├── config/
-│   │   │   └── LlmConfig.kt           # Multi-provider configuration (Gemini / Groq)
-│   │   ├── knowledge/
-│   │   │   └── MigrationPatterns.kt   # Knowledge base loader & prompt formatter
-│   │   ├── mcp/
-│   │   │   └── McpServer.kt           # Ktor MCP Server implementation
-│   │   ├── orchestrator/
-│   │   │   └── ModernizationGraph.kt  # Stage 6: Graph engine & workflow node manager
-│   │   ├── state/
-│   │   │   └── GraphState.kt          # Shared immutable state & status data models
-│   │   └── tools/
-│   │       ├── JavaAstTool.kt         # JavaParser wrapper & Kahn's topo sort implementation
-│   │       ├── CharacterizationTool.kt# Reflective Java compiler & ground-truth test capture
-│   │       ├── KotlinCompileTool.kt   # Embedded Kotlin compiler wrapper (K2JVMCompiler)
-│   │       └── SandboxRunner.kt       # Sandboxed process & optional Docker container runner
-│   └── test/kotlin/com/issam/apollo/ # Unit & integration test suites
-│       ├── agents/
-│       ├── orchestrator/
-│       └── tools/
-├── migrated-src/                      # Transformed Kotlin output source tree
-└── reports/                           # Pipeline runtime artifacts, specs, and summaries
-    ├── specs/                         # Per-module Markdown & JSON specifications
-    ├── characterization/              # Per-module ground-truth JSON test cases
-    ├── verification/                  # Per-module verification execution logs
-    ├── topo-order.md                  # Module migration sequence report
-    └── migration-summary.md           # Final pipeline summary report
+│   │   ├── Main.kt                    # CLI Entrypoint & process exit handler
+│   │   ├── agents/                    # Core pipeline agents (Analyzer, Migrator, Verifier, Fixer)
+│   │   ├── config/                    # LlmConfig with 2-tier routing & circuit breakers
+│   │   ├── orchestrator/              # ModernizationGraph state machine & ResumeManager
+│   │   ├── state/                     # GraphState & ModuleStatus immutable models
+│   │   └── tools/                     # JavaParser AST, AAPT2, Gradle resolver, K2JVMCompiler
+│   └── test/kotlin/com/issam/apollo/  # Comprehensive unit and integration test suites
+├── migrated-src/                      # Output directory for generated Kotlin source files
+└── reports/                           # Output directory for specs, char tests, and summary reports
 ```
 
 ---
 
-## 🛠️ Setup & Execution Guide
+## ⚙️ Setup & Environment Configuration
 
 ### Prerequisites
-* **Java Development Kit (JDK)**: Version 17 or higher.
-* **Gradle**: 8.x (or use the provided `./gradlew` wrapper).
+* **JDK 17+** (JDK 17 or JDK 21 recommended).
+* **Ollama** running locally or on an accessible network instance with the required models:
+  ```bash
+  ollama pull qwen3.8:27b
+  ollama pull qwen3-coder:30b
+  ```
 
-### Environment Setup
-Create or update the `.env` file in the root directory:
-
+### Configuration (`.env`)
+Create or edit `.env` in the repository root:
 ```env
-# Provider Options: gemini | groq
-LLM_PROVIDER=gemini
+# Primary LLM Provider: groq | ollama
+LLM_PROVIDER=ollama
+LLM_MODEL=openai/gpt-oss-120b
 
-# Gemini Configuration
-GEMINI_API_KEY=your_gemini_api_key_here
-LLM_MODEL=gemini-1.5-pro
+# Ollama 2-Tier Configuration
+OLLAMA_BASE_URL=http://localhost:11434/v1
+OLLAMA_API_KEY=
+OLLAMA_MODEL_PRIMARY=qwen3-coder:30b
+OLLAMA_MODEL_ESCALATION=qwen3.8:27b
 
-# Groq Configuration (Optional)
+# Groq Cloud Fallback (optional)
 GROQ_API_KEY=your_groq_api_key_here
+
+# Execution parameters
+SANDBOX_DOCKER_ENABLED=false
+MAX_RETRY_COUNT=10
 ```
 
 ---
 
 ## 💻 Running Apollo
 
-### 1. Execute CLI Migration
-To run the full 6-stage migration pipeline on a target project directory:
-
+### 1. Migrate a Project
 ```bash
-# Migrate the included sample project
+# Migrate the built-in sample legacy project
 ./gradlew run --args="sample-legacy"
 
-# Migrate a custom Java project
-./gradlew run --args="D:/Projects/MyLegacyApp"
+# Migrate a custom project
+./gradlew run --args="D:/Projects/MyAndroidApp"
 ```
 
-### 2. Start MCP Server Mode
-To start Apollo as a Model Context Protocol background service:
+### 2. Resume an Interrupted Migration
+```bash
+# Automatically resumes from the last completed stage
+./gradlew run --args="--resume sample-legacy"
+```
 
+### 3. Start MCP REST Server
 ```bash
 ./gradlew run --args="--server"
 ```
 
-### 3. Run Test Suite
-To execute all agent and tool unit/integration tests:
+---
+
+## 🧪 Testing Guide & Verification Strategy
+
+Apollo contains both fast unit tests and end-to-end integration test suites:
+
+### Recommended: Agent-by-Agent Testing (Fast & Isolated)
+Run test suites individually for fast verification (~10–20 seconds each):
+```bash
+# 1. Analyzer Agent AST parsing & topo sort
+./gradlew test --tests com.issam.apollo.agents.AnalyzerAgentTest
+
+# 2. LLM Config 2-tier routing & circuit breaker
+./gradlew test --tests com.issam.apollo.config.LlmConfigTest
+
+# 3. Resume Manager stage validation & state recovery
+./gradlew test --tests com.issam.apollo.orchestrator.ResumeManagerTest
+
+# 4. Fixer Agent self-healing repair & retry cap logic
+./gradlew test --tests com.issam.apollo.agents.FixerAgentTest
+```
+
+### Full End-to-End Test Suites (Invokes Live LLMs)
+> ⚠️ **Note:** `VerifierAgentTest` and `OrchestratorTest` execute live migration and reflective verification across all 5 sample legacy modules using Ollama models. These tests take **5–10 minutes** depending on hardware.
 
 ```bash
-./gradlew test
+# End-to-end Verifier Agent test with live compilation
+./gradlew test --tests com.issam.apollo.agents.VerifierAgentTest
+
+# End-to-end Graph Orchestrator execution
+./gradlew test --tests com.issam.apollo.orchestrator.OrchestratorTest
 ```
-
----
-
-## 🔄 Transformation Showcase (Before & After)
-
-### Legacy Java POJO (`User.java`)
-```java
-package com.example.legacy;
-
-public class User {
-    private String id;
-    private String username;
-    private String email;
-    private int age;
-
-    public User(String id, String username, String email, int age) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.age = age;
-    }
-
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public int getAge() { return age; }
-    public void setAge(int age) { this.age = age; }
-}
-```
-
-### Apollo Modernized Kotlin Data Class (`User.kt`)
-```kotlin
-package com.example.legacy
-
-/**
- * Modernized by Apollo Agent (Stage 3 Migrator)
- * Pattern: POJO -> Kotlin Data Class
- */
-data class User(
-    var id: String? = null,
-    var username: String? = null,
-    var email: String? = null,
-    var age: Int = 0
-)
-```
-
----
-
-## 📜 Reports & Output Artifacts
-
-Following pipeline completion, summary artifacts are saved to `reports/`:
-
-* **`reports/migration-summary.md`**: Human-readable Markdown summary detailing pipeline status, compilation status, test pass rates, and module regeneration counts.
-* **`reports/migration-report-<timestamp>.json`**: Machine-readable JSON output containing stage reports and metrics.
-* **`reports/topo-order.md`**: Dependency analysis table and topological ordering.
-* **`reports/verification/verification-summary.md`**: Test pass/fail statistics for ground-truth characterization suites.
 
 ---
 

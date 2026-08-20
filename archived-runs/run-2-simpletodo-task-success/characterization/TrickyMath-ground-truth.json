@@ -1,0 +1,207 @@
+[
+    {
+        "testId": "TC-20",
+        "className": "TrickyMath",
+        "methodName": "isBitSet",
+        "inputs": [
+            "25",
+            "25"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-21",
+        "className": "TrickyMath",
+        "methodName": "isBitSet",
+        "inputs": [
+            "25",
+            "0"
+        ],
+        "expectedOutput": "true"
+    },
+    {
+        "testId": "TC-22",
+        "className": "TrickyMath",
+        "methodName": "isBitSet",
+        "inputs": [
+            "25",
+            "17"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-23",
+        "className": "TrickyMath",
+        "methodName": "isBitSet",
+        "inputs": [
+            "25",
+            "-1"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-24",
+        "className": "TrickyMath",
+        "methodName": "isBitSet",
+        "inputs": [
+            "25",
+            "2147483647"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-25",
+        "className": "TrickyMath",
+        "methodName": "isBitSet",
+        "inputs": [
+            "0",
+            "25"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-26",
+        "className": "TrickyMath",
+        "methodName": "isBitSet",
+        "inputs": [
+            "0",
+            "0"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-27",
+        "className": "TrickyMath",
+        "methodName": "isBitSet",
+        "inputs": [
+            "0",
+            "17"
+        ],
+        "expectedOutput": "false"
+    },
+    {
+        "testId": "TC-28",
+        "className": "TrickyMath",
+        "methodName": "safeAdd",
+        "inputs": [
+            "25",
+            "25"
+        ],
+        "expectedOutput": "50"
+    },
+    {
+        "testId": "TC-29",
+        "className": "TrickyMath",
+        "methodName": "safeAdd",
+        "inputs": [
+            "25",
+            "0"
+        ],
+        "expectedOutput": "25"
+    },
+    {
+        "testId": "TC-30",
+        "className": "TrickyMath",
+        "methodName": "safeAdd",
+        "inputs": [
+            "25",
+            "17"
+        ],
+        "expectedOutput": "42"
+    },
+    {
+        "testId": "TC-31",
+        "className": "TrickyMath",
+        "methodName": "safeAdd",
+        "inputs": [
+            "25",
+            "-1"
+        ],
+        "expectedOutput": "24"
+    },
+    {
+        "testId": "TC-32",
+        "className": "TrickyMath",
+        "methodName": "safeAdd",
+        "inputs": [
+            "25",
+            "2147483647"
+        ],
+        "expectedOutput": "2147483647"
+    },
+    {
+        "testId": "TC-33",
+        "className": "TrickyMath",
+        "methodName": "safeAdd",
+        "inputs": [
+            "0",
+            "25"
+        ],
+        "expectedOutput": "25"
+    },
+    {
+        "testId": "TC-34",
+        "className": "TrickyMath",
+        "methodName": "safeAdd",
+        "inputs": [
+            "0",
+            "0"
+        ],
+        "expectedOutput": "0"
+    },
+    {
+        "testId": "TC-35",
+        "className": "TrickyMath",
+        "methodName": "safeAdd",
+        "inputs": [
+            "0",
+            "17"
+        ],
+        "expectedOutput": "17"
+    },
+    {
+        "testId": "TC-36",
+        "className": "TrickyMath",
+        "methodName": "formatCurrency",
+        "inputs": [
+            "0.0"
+        ],
+        "expectedOutput": "$0.00"
+    },
+    {
+        "testId": "TC-37",
+        "className": "TrickyMath",
+        "methodName": "formatCurrency",
+        "inputs": [
+            "3.14"
+        ],
+        "expectedOutput": "$3.14"
+    },
+    {
+        "testId": "TC-38",
+        "className": "TrickyMath",
+        "methodName": "formatCurrency",
+        "inputs": [
+            "-1.0"
+        ],
+        "expectedOutput": "$-1.00"
+    },
+    {
+        "testId": "TC-39",
+        "className": "TrickyMath",
+        "methodName": "formatCurrency",
+        "inputs": [
+            "NaN"
+        ],
+        "expectedOutput": "INVALID"
+    },
+    {
+        "testId": "TC-40",
+        "className": "TrickyMath",
+        "methodName": "formatCurrency",
+        "inputs": [
+            "Infinity"
+        ],
+        "expectedOutput": "INVALID"
+    }
+]

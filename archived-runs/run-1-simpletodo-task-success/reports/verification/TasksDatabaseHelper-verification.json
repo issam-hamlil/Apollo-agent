@@ -1,0 +1,30 @@
+{
+    "className": "TasksDatabaseHelper",
+    "totalTests": 21,
+    "passedTests": 0,
+    "failedTests": 21,
+    "status": "FAILED",
+    "failureDetails": [
+        "Test TC-73 (addTask): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: addTask'",
+        "Test TC-74 (addTask): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: addTask'",
+        "Test TC-75 (addTask): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: addTask'",
+        "Test TC-76 (addTask): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: addTask'",
+        "Test TC-77 (addTask): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: addTask'",
+        "Test TC-78 (getAllTasks): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: getAllTasks'",
+        "Test TC-79 (onConfigure): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onConfigure'",
+        "Test TC-80 (onConfigure): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onConfigure'",
+        "Test TC-81 (onUpgrade): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onUpgrade'",
+        "Test TC-82 (onUpgrade): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onUpgrade'",
+        "Test TC-83 (onUpgrade): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onUpgrade'",
+        "Test TC-84 (onUpgrade): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onUpgrade'",
+        "Test TC-85 (onUpgrade): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onUpgrade'",
+        "Test TC-86 (onUpgrade): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onUpgrade'",
+        "Test TC-87 (onUpgrade): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onUpgrade'",
+        "Test TC-88 (onUpgrade): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onUpgrade'",
+        "Test TC-89 (addOrUpdateTask): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: addOrUpdateTask'",
+        "Test TC-90 (addOrUpdateTask): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: addOrUpdateTask'",
+        "Test TC-91 (deleteAllTasks): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: deleteAllTasks'",
+        "Test TC-92 (onCreate): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onCreate'",
+        "Test TC-93 (onCreate): expected 'EXCEPTION: NoSuchMethodException: com.clinton.simpletodo.utils.TasksDatabaseHelper.<init>()', got 'METHOD_NOT_FOUND: onCreate'"
+    ]
+}

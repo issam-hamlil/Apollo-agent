@@ -56,6 +56,13 @@ class SandboxRunner(private val enableDocker: Boolean = false) {
 
         return try {
             val process = processBuilder.start()
+            val stdoutFuture = java.util.concurrent.CompletableFuture.supplyAsync {
+                process.inputStream.bufferedReader().use { it.readText() }
+            }
+            val stderrFuture = java.util.concurrent.CompletableFuture.supplyAsync {
+                process.errorStream.bufferedReader().use { it.readText() }
+            }
+
             val completed = process.waitFor(timeoutSeconds, TimeUnit.SECONDS)
 
             if (!completed) {
@@ -63,8 +70,8 @@ class SandboxRunner(private val enableDocker: Boolean = false) {
                 return SandboxExecutionResult(-1, "", "Execution timed out after $timeoutSeconds seconds", isDocker)
             }
 
-            val stdout = process.inputStream.bufferedReader().readText()
-            val stderr = process.errorStream.bufferedReader().readText()
+            val stdout = stdoutFuture.get(5, TimeUnit.SECONDS) ?: ""
+            val stderr = stderrFuture.get(5, TimeUnit.SECONDS) ?: ""
             SandboxExecutionResult(process.exitValue(), stdout, stderr, isDocker)
         } catch (e: Exception) {
             SandboxExecutionResult(-1, "", e.message ?: "Execution error", isDocker)

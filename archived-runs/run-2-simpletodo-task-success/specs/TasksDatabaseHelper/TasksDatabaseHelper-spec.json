@@ -1,0 +1,33 @@
+{
+    "className": "TasksDatabaseHelper",
+    "packageName": "com.clinton.simpletodo.utils",
+    "imports": [
+        "android.content.ContentValues",
+        "android.content.Context",
+        "android.database.Cursor",
+        "android.database.sqlite.SQLiteDatabase",
+        "android.database.sqlite.SQLiteOpenHelper",
+        "android.util.Log",
+        "java.util.ArrayList"
+    ],
+    "fields": [
+        "String TAG",
+        "String DATABASE_NAME",
+        "int DATABASE_VERSION"
+    ],
+    "methods": [
+        "public void onConfigure(SQLiteDatabase db)",
+        "public void onCreate(SQLiteDatabase db)",
+        "public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)",
+        "public void addTask(String task)",
+        "public long addOrUpdateTask(Task task)",
+        "public ArrayList<String> getAllTasks()",
+        "public void deleteAllTasks()"
+    ],
+    "dependsOn": [
+        "Task",
+        "TaskContract"
+    ],
+    "businessLogicSummary": "1. **Purpose** — The `TasksDatabaseHelper` class is responsible for managing a SQLite database in an Android application, providing methods to add, retrieve, update, and delete tasks.\n\n2. **Core Logic** \n   - Manages the lifecycle of the database, including creation (`onCreate`) and upgrade (`onUpgrade`).\n   - Provides methods to add tasks (`addTask`, `addOrUpdateTask`), retrieve all tasks (`getAllTasks`), and delete all tasks (`deleteAllTasks`).\n\n3. **Migration Notes** \n   - Use Kotlin's data classes for the `Task` model to improve immutability and reduce boilerplate.\n   - Utilize Kotlin coroutines for database operations to handle them asynchronously, improving app responsiveness.\n   - Leverage Kotlin extensions for SQLite operations to make the code more concise and readable.\n\n4. **Dependencies** \n   - Relies on the `Task` class for task data representation.\n   - Depends on the `TaskContract` class for database schema definitions.",
+    "sourceFilePath": "D:\\Projects\\projects-to-test-on\\SimpleToDo\\app\\src\\main\\java\\com\\clinton\\simpletodo\\utils\\TasksDatabaseHelper.java"
+}

@@ -1,0 +1,28 @@
+{
+    "className": "User",
+    "packageName": "com.example.legacy",
+    "imports": [
+        "java.util.Objects"
+    ],
+    "fields": [
+        "String id",
+        "String username",
+        "String email",
+        "int age"
+    ],
+    "methods": [
+        "public String getId()",
+        "public void setId(String id)",
+        "public String getUsername()",
+        "public void setUsername(String username)",
+        "public String getEmail()",
+        "public void setEmail(String email)",
+        "public int getAge()",
+        "public void setAge(int age)",
+        "public boolean equals(Object o)",
+        "public int hashCode()",
+        "public String toString()"
+    ],
+    "businessLogicSummary": "**User** — `com.example.legacy`\n\n**Fields (4):** String id, String username, String email, int age\n**Methods (11):**\n  - `public String getId()`\n  - `public void setId(String id)`\n  - `public String getUsername()`\n  - `public void setUsername(String username)`\n  - `public String getEmail()`\n  - `public void setEmail(String email)`\n  - `public int getAge()`\n  - `public void setAge(int age)`\n  - `public boolean equals(Object o)`\n  - `public int hashCode()`\n  - `public String toString()`\n\n*(AST-only summary — LLM unavailable)*\n",
+    "sourceFilePath": "D:\\Projects\\Apollo-agent\\sample-legacy\\src\\main\\java\\com\\example\\legacy\\User.java"
+}

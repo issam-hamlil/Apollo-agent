@@ -1,0 +1,85 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260819110752
+Username: ISSAM_PC\issam
+RunAs User: ISSAM_PC\issam
+Configuration Name: 
+Machine: ISSAM_PC (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noexit -command try { . "d:\Antigravity\resources\app\out\vs\workbench\contrib\terminal\common\scripts\shellIntegration.ps1" } catch {}
+Process ID: 21008
+PSVersion: 5.1.26100.9168
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9168
+BuildVersion: 10.0.26100.9168
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is terminal.log
+]633;D;0]633;A]633;P;Cwd=D:\x5cProjects\x5cApollo-agentPS D:\Projects\Apollo-agent> ]633;B
+PS>./gradlew run --args="D:\Projects\projects-to-test-on\SimpleToDo\app\src\main\java"
+Execution failed for task ':run'.
+> Process 'command 'C:\Users\issam\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin\java.exe'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 1h 18m 32s
+2 actionable tasks: 1 executed, 1 up-to-date
+]633;D;1]633;A]633;P;Cwd=D:\x5cProjects\x5cApollo-agentPS D:\Projects\Apollo-agent> ]633;B
+PS>clear
+]633;D;0]633;A]633;P;Cwd=D:\x5cProjects\x5cApollo-agentPS D:\Projects\Apollo-agent> ]633;B
+PS>./gradlew run --args="D:\Projects\projects-to-test-on\SimpleToDo\app\src\main\java"
+
+* What went wrong:
+Execution failed for task ':run'.
+> Process 'command 'C:\Users\issam\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin\java.exe'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 23m 42s
+2 actionable tasks: 1 executed, 1 up-to-date
+]633;D;1]633;A]633;P;Cwd=D:\x5cProjects\x5cApollo-agentPS D:\Projects\Apollo-agent> ]633;B
+PS>clear
+]633;D;0]633;A]633;P;Cwd=D:\x5cProjects\x5cApollo-agentPS D:\Projects\Apollo-agent> ]633;B
+PS>./gradlew run --args="D:\Projects\projects-to-test-on\SimpleToDo\app\src\main\java"
+
+* What went wrong:
+Execution failed for task ':run'.
+> Process 'command 'C:\Users\issam\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin\java.exe'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 36m 59s
+2 actionable tasks: 1 executed, 1 up-to-date
+]633;D;1]633;A]633;P;Cwd=D:\x5cProjects\x5cApollo-agentPS D:\Projects\Apollo-agent> ]633;B

@@ -22,3 +22,7 @@ reports/*
 # System files
 .DS_Store
 Thumbs.db
+
+# Android SDK stub jar (binary, sourced locally from $ANDROID_HOME)
+# Directory is tracked via .gitkeep; the jar itself is not committed.
+libs/android-stubs/android.jar

@@ -1,0 +1,90 @@
+[
+    {
+        "testId": "TC-69",
+        "className": "UserService",
+        "methodName": "formatUserSummary",
+        "inputs": [
+            "User{id='null', username='null', email='null', age=0}"
+        ],
+        "expectedOutput": "Anonymous (no-email)"
+    },
+    {
+        "testId": "TC-70",
+        "className": "UserService",
+        "methodName": "formatUserSummary",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "N/A"
+    },
+    {
+        "testId": "TC-71",
+        "className": "UserService",
+        "methodName": "filterAdults",
+        "inputs": [],
+        "expectedOutput": "[]"
+    },
+    {
+        "testId": "TC-72",
+        "className": "UserService",
+        "methodName": "addUser",
+        "inputs": [
+            "User{id='null', username='null', email='null', age=0}"
+        ],
+        "expectedOutput": "EXCEPTION: IllegalArgumentException: User ID cannot be null or empty"
+    },
+    {
+        "testId": "TC-73",
+        "className": "UserService",
+        "methodName": "addUser",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "EXCEPTION: IllegalArgumentException: User cannot be null"
+    },
+    {
+        "testId": "TC-74",
+        "className": "UserService",
+        "methodName": "findById",
+        "inputs": [
+            "hello"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-75",
+        "className": "UserService",
+        "methodName": "findById",
+        "inputs": [
+            ""
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-76",
+        "className": "UserService",
+        "methodName": "findById",
+        "inputs": [
+            "   "
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-77",
+        "className": "UserService",
+        "methodName": "findById",
+        "inputs": [
+            "APOLLO"
+        ],
+        "expectedOutput": "null"
+    },
+    {
+        "testId": "TC-78",
+        "className": "UserService",
+        "methodName": "findById",
+        "inputs": [
+            "null"
+        ],
+        "expectedOutput": "null"
+    }
+]

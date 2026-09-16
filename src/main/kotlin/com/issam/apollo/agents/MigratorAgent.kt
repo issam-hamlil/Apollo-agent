@@ -10,8 +10,10 @@ import ai.koog.prompt.llm.LLMProvider
 import ai.koog.prompt.llm.LLModel
 import com.issam.apollo.config.FatalWatchdogAbortException
 import com.issam.apollo.config.LlmConfig
+import com.issam.apollo.config.MigrationPolicy
 import com.issam.apollo.config.LlmProvider as ApolloProvider
 import com.issam.apollo.knowledge.MigrationPattern
+import com.issam.apollo.knowledge.DeprecationScanner
 import com.issam.apollo.knowledge.MigrationPatterns
 import com.issam.apollo.telemetry.ApolloTelemetry
 import com.issam.apollo.telemetry.ModuleActivityEvent
@@ -39,6 +41,7 @@ import java.time.Instant
  */
 class MigratorAgent(
     private val migrationPatterns: MigrationPatterns = MigrationPatterns(),
+    private val deprecationScanner: DeprecationScanner = DeprecationScanner(),
     private val migratedOutputDir: File = File("").absoluteFile.resolve("migrated-src")
 ) {
 
@@ -294,6 +297,16 @@ class MigratorAgent(
         dependencyContext: String
     ): MigrationLlmResult {
         val patternPrompt = migrationPatterns.formatPatternsForPrompt(patterns)
+        // Scoped to this file: only deprecated APIs the source actually uses are described,
+        // so the model is never told to modernise something that is not there.
+        val deprecationFindings = deprecationScanner.scanSource(javaSource)
+        val deprecationPrompt = deprecationScanner.formatForPrompt(deprecationFindings)
+        if (deprecationFindings.isNotEmpty()) {
+            println(
+                "[MigratorAgent] $className: ${deprecationFindings.size} deprecated API(s) to modernise: " +
+                    deprecationFindings.joinToString(", ") { it.migration.id }
+            )
+        }
 
         val systemPromptStr = """
             You are Apollo, an expert Java-to-Kotlin Migration AI Agent.
@@ -306,6 +319,9 @@ class MigratorAgent(
             4. Ensure compatibility with previously migrated Kotlin dependency classes provided in context.
             5. STRICT CLEAN KOTLIN: Do NOT include trailing semicolons (`;`) on package statements, import lines, or code lines. Remove all unused imports (e.g., `import java.util.ArrayList`).
             6. NO REDECLARATIONS: Do NOT redeclare classes (e.g., `User`) that are already provided in dependency context or package scope.
+            7. MODERNISE DEPRECATED APIs: This is legacy code. Where it uses an API or library that is deprecated, replace it with the current supported equivalent - do not carry the deprecated call forward. Any deprecated APIs actually present are listed in the user message with their replacements.
+            8. ${MigrationPolicy.promptDirective()}
+            9. LIBRARY CHOICE IS YOURS: You are NOT required to keep the libraries the Java used. Pick whatever is idiomatic and currently supported for Kotlin. The one constraint is behaviour: the migrated code must still do what the original did, so never swap a library in a way that changes observable behaviour.
         """.trimIndent()
 
         val userPromptStr = """
@@ -317,6 +333,8 @@ class MigratorAgent(
 
             Curated Migration Patterns to Apply:
             $patternPrompt
+
+            $deprecationPrompt
 
             Previously Migrated Dependencies Context:
             $dependencyContext

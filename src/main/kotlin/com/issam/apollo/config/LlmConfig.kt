@@ -45,6 +45,9 @@ object LlmConfig {
     }
 
     // Groq configuration
+    /** Raw .env lookup, so non-LLM settings (e.g. MigrationPolicy) can share the same file. */
+    fun rawSetting(key: String): String? = dotenv?.get(key)
+
     val groqApiKey: String = dotenv?.get("GROQ_API_KEY") ?: System.getenv("GROQ_API_KEY") ?: ""
 
     // OLLAMA_BASE_URL  — base URL of the Ollama HTTP endpoint

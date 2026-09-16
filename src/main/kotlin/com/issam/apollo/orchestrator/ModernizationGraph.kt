@@ -12,6 +12,7 @@ import com.issam.apollo.state.AgentReport
 import com.issam.apollo.state.GraphState
 import com.issam.apollo.state.ModuleStatus
 import com.issam.apollo.state.StageStatus
+import com.issam.apollo.reporting.RunReportWriter
 import com.issam.apollo.tools.CharacterizationTool
 import com.issam.apollo.tools.EnvironmentPreflight
 import java.io.File
@@ -69,9 +70,11 @@ class ModernizationGraph(
                 "[GraphEngine] [FATAL] Halting before Stage 1: the generated Kotlin could not " +
                     "compile in this environment regardless of what the LLM produces."
             )
-            return GraphState(
-                targetProjectPath = targetProjectPath,
-                currentStage = "ENVIRONMENT_PREFLIGHT_FAILED"
+            return finishRun(
+                GraphState(
+                    targetProjectPath = targetProjectPath,
+                    currentStage = "ENVIRONMENT_PREFLIGHT_FAILED"
+                )
             )
         }
 
@@ -248,9 +251,11 @@ class ModernizationGraph(
                     metrics = mapOf("fatalWatchdogAbort" to "true")
                 )
                 val updatedReports = state.reports.toMutableList().apply { add(report) }
-                return state.copy(
-                    currentStage = "FATAL_WATCHDOG_ABORT",
-                    reports = updatedReports
+                return finishRun(
+                    state.copy(
+                        currentStage = "FATAL_WATCHDOG_ABORT",
+                        reports = updatedReports
+                    )
                 )
             }
         }
@@ -260,7 +265,29 @@ class ModernizationGraph(
         println("|    Apollo Agent - Modernization Graph Execution Finished    |")
         println("+-------------------------------------------------------------+\n")
 
-        return state
+        return finishRun(state)
+    }
+
+    /**
+     * Writes the run's log plus its success/failure report.
+     *
+     * This lives in the pipeline rather than in Main.kt so EVERY caller gets reports.
+     * When it sat in the CLI entry point, runs started from the desktop console finished
+     * without producing any report at all.
+     */
+    private fun finishRun(state: GraphState): GraphState {
+        return try {
+            // Machine-readable state envelope: this is what --resume reads back.
+            ResumeManager.saveMigrationReport(state, reportsDir)
+            val written = RunReportWriter.write(state, reportsDir)
+            val kind = if (written.succeeded) "SUCCESS" else "FAILURE"
+            println("[Reports] $kind report: ${written.outcome.absolutePath}")
+            println("[Reports] Run log:        ${written.log.absolutePath}")
+            state
+        } catch (e: Exception) {
+            System.err.println("[Reports] Could not write reports: ${e.message}")
+            state
+        }
     }
 
     /**

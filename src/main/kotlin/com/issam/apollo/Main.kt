@@ -118,9 +118,8 @@ fun main(args: Array<String>) {
     println(" Total Stage Reports: ${finalState.reports.size}")
     println("--------------------------------------------------\n")
 
-    // Export runtime reports to reports/ directory via ResumeManager
-    val reportFile = com.issam.apollo.orchestrator.ResumeManager.saveMigrationReport(finalState, reportsDir)
-    println("Reports generated successfully: ${reportFile.name} under ${reportsDir.absolutePath}")
+    // Reports (log + success/failure) are written by ModernizationGraph itself, so every
+    // caller - CLI and desktop console alike - produces them. Nothing to do here.
 
     // Explicitly terminate the JVM process so background thread pools / connection pools
     // do not keep Gradle hanging at 83% EXECUTING.

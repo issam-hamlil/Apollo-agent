@@ -10,6 +10,7 @@ import ai.koog.prompt.llm.LLMProvider
 import ai.koog.prompt.llm.LLModel
 import com.issam.apollo.config.FatalWatchdogAbortException
 import com.issam.apollo.config.LlmConfig
+import com.issam.apollo.config.MigrationPolicy
 import com.issam.apollo.config.LlmProvider as ApolloProvider
 import com.issam.apollo.state.AgentReport
 import com.issam.apollo.state.GraphState
@@ -642,6 +643,7 @@ class FixerAgent(
                >>>>>>> REPLACE
 
             3. Fix ALL reported errors in the failure logs for $className:
+               - ${MigrationPolicy.promptDirective()}
                - Fix compilation, syntax errors, and failing logic precisely according to the failure logs.
                - Add necessary missing imports.
                - Match the ground-truth expectation EXACTLY as reported. The expected value is the observed behaviour of the original Java method - never assume a convention.

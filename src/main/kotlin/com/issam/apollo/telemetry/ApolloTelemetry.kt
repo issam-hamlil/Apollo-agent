@@ -114,11 +114,67 @@ object ApolloTelemetry {
 
     private val callIds = AtomicLong(0)
 
+    /**
+     * One LLM exchange kept in memory so a failure report can show exactly what the model
+     * was asked for the modules that did not make it.
+     */
+    data class RecordedExchange(
+        val callId: Long,
+        val module: String,
+        val provider: String,
+        val model: String,
+        val attempt: Int,
+        val systemPrompt: String,
+        val userPrompt: String,
+        var ok: Boolean = false,
+        var finished: Boolean = false,
+        var response: String = "",
+        var error: String = ""
+    )
+
+    private const val MAX_RECORDED_EXCHANGES = 200
+    private val recorded = java.util.Collections.synchronizedList(mutableListOf<RecordedExchange>())
+
+    /** Exchanges for [module], oldest first. Empty when the module never reached an LLM. */
+    fun exchangesFor(module: String): List<RecordedExchange> =
+        synchronized(recorded) { recorded.filter { it.module == module }.toList() }
+
+    fun allExchanges(): List<RecordedExchange> = synchronized(recorded) { recorded.toList() }
+
+    fun resetRecordedExchanges() = synchronized(recorded) { recorded.clear() }
+
+    private fun record(event: ApolloEvent) {
+        when (event) {
+            is LlmCallEvent -> synchronized(recorded) {
+                recorded.add(
+                    RecordedExchange(
+                        event.callId, event.module, event.provider, event.model,
+                        event.attempt, event.systemPrompt, event.userPrompt
+                    )
+                )
+                while (recorded.size > MAX_RECORDED_EXCHANGES) recorded.removeAt(0)
+            }
+
+            is LlmResultEvent -> synchronized(recorded) {
+                // A failed stream can report twice; keep the first verdict.
+                recorded.lastOrNull { it.callId == event.callId && !it.finished }?.apply {
+                    finished = true
+                    ok = event.ok
+                    response = event.response
+                    error = event.error
+                }
+            }
+
+            else -> Unit
+        }
+    }
+
     fun nextCallId(): Long = callIds.incrementAndGet()
 
     /** Never blocks and never throws - telemetry must not be able to fail a migration. */
     fun emit(event: ApolloEvent) {
         try {
+            record(event)
             _events.tryEmit(event)
         } catch (_: Throwable) {
             // Deliberately ignored.

@@ -1,0 +1,212 @@
+{
+  "_comment": "Deprecated APIs and dependencies, with their modern replacements. Only entries whose 'match' strings actually appear in the project being migrated are injected into a prompt, so the model is never handed advice about APIs the code does not use. Nothing here tells the model to keep the original libraries - it is free to choose a better one. The minimum supported Android API level is declared by config/MigrationPolicy (APOLLO_MIN_SDK, default 29 = Android 10); entries must not hedge about older releases - anything at or below that floor is available unconditionally.",
+  "migrations": [
+    {
+      "id": "support-library-to-androidx",
+      "kind": "DEPENDENCY",
+      "match": [
+        "android.support.",
+        "com.android.support:"
+      ],
+      "deprecatedSince": "2018 - the Android Support Library was superseded by AndroidX and receives no updates",
+      "modern": "androidx.* (androidx.appcompat:appcompat, androidx.core:core-ktx, ...)",
+      "guidance": "Replace every android.support.* import with its androidx equivalent, e.g. android.support.v7.app.AppCompatActivity -> androidx.appcompat.app.AppCompatActivity, android.support.v4.app.Fragment -> androidx.fragment.app.Fragment."
+    },
+    {
+      "id": "actionbaractivity-to-appcompatactivity",
+      "kind": "API",
+      "match": [
+        "ActionBarActivity"
+      ],
+      "deprecatedSince": "API 22",
+      "modern": "androidx.appcompat.app.AppCompatActivity",
+      "guidance": "ActionBarActivity was replaced by AppCompatActivity. Extend AppCompatActivity instead."
+    },
+    {
+      "id": "activity-result-api",
+      "kind": "API",
+      "match": [
+        "startActivityForResult",
+        "onActivityResult"
+      ],
+      "deprecatedSince": "API 30 / androidx.activity 1.2",
+      "modern": "Activity Result API - registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { ... }",
+      "guidance": "Replace the startActivityForResult + onActivityResult request-code pair with a launcher registered at construction time: private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> if (result.resultCode == RESULT_OK) { ... } }, then call launcher.launch(intent). Add androidx.activity if the module does not already depend on it."
+    },
+    {
+      "id": "asynctask-to-coroutines",
+      "kind": "API",
+      "match": [
+        "AsyncTask"
+      ],
+      "deprecatedSince": "API 30",
+      "modern": "Kotlin coroutines (lifecycleScope / viewModelScope + Dispatchers.IO)",
+      "guidance": "Replace AsyncTask with a coroutine: lifecycleScope.launch { val result = withContext(Dispatchers.IO) { work() }; updateUi(result) }. doInBackground becomes the withContext block, onPostExecute the code after it."
+    },
+    {
+      "id": "loader-to-viewmodel",
+      "kind": "API",
+      "match": [
+        "CursorLoader",
+        "LoaderManager",
+        "AsyncTaskLoader",
+        "getSupportLoaderManager"
+      ],
+      "deprecatedSince": "API 28",
+      "modern": "ViewModel + coroutines (and Room for database access)",
+      "guidance": "Loaders are deprecated. Move the data loading into a ViewModel exposing StateFlow/LiveData, backed by a coroutine on Dispatchers.IO."
+    },
+    {
+      "id": "framework-fragment-to-androidx",
+      "kind": "API",
+      "match": [
+        "android.app.Fragment",
+        "android.app.FragmentManager",
+        "android.app.FragmentTransaction"
+      ],
+      "deprecatedSince": "API 28",
+      "modern": "androidx.fragment.app.Fragment / FragmentManager",
+      "guidance": "The framework Fragment class is deprecated. Use the AndroidX fragment library instead."
+    },
+    {
+      "id": "preference-to-androidx",
+      "kind": "API",
+      "match": [
+        "android.preference.",
+        "PreferenceActivity",
+        "PreferenceFragment"
+      ],
+      "deprecatedSince": "API 29",
+      "modern": "androidx.preference:preference (PreferenceFragmentCompat)",
+      "guidance": "android.preference.* is deprecated. Use androidx.preference.PreferenceFragmentCompat hosted in an AppCompatActivity."
+    },
+    {
+      "id": "handler-no-arg-constructor",
+      "kind": "API",
+      "match": [
+        "new Handler()"
+      ],
+      "deprecatedSince": "API 30",
+      "modern": "Handler(Looper.getMainLooper())",
+      "guidance": "The implicit-Looper Handler constructor is deprecated because it silently picks the current thread's Looper. Pass the Looper explicitly: Handler(Looper.getMainLooper())."
+    },
+    {
+      "id": "onbackpressed-to-dispatcher",
+      "kind": "API",
+      "match": [
+        "onBackPressed"
+      ],
+      "deprecatedSince": "API 33",
+      "modern": "OnBackPressedDispatcher",
+      "guidance": "Override of onBackPressed is deprecated. Register a callback: onBackPressedDispatcher.addCallback(this) { ... }."
+    },
+    {
+      "id": "getcolor-getdrawable-compat",
+      "kind": "API",
+      "match": [
+        "getResources().getColor(",
+        "getResources().getDrawable(",
+        "getColor(R.color",
+        "getDrawable(R.drawable"
+      ],
+      "deprecatedSince": "API 23 (getColor) / API 22 (getDrawable)",
+      "modern": "ContextCompat.getColor(context, id) / ContextCompat.getDrawable(context, id)",
+      "guidance": "The theme-less Resources.getColor/getDrawable overloads are deprecated. Use ContextCompat, which resolves against the context's theme."
+    },
+    {
+      "id": "html-fromhtml-flags",
+      "kind": "API",
+      "match": [
+        "Html.fromHtml("
+      ],
+      "deprecatedSince": "API 24",
+      "modern": "HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY)",
+      "guidance": "The single-argument Html.fromHtml is deprecated. Use HtmlCompat with an explicit flags argument."
+    },
+    {
+      "id": "progressdialog-removed",
+      "kind": "API",
+      "match": [
+        "ProgressDialog"
+      ],
+      "deprecatedSince": "API 26",
+      "modern": "An inline ProgressBar, or a custom dialog",
+      "guidance": "ProgressDialog is deprecated because it blocks interaction. Show a ProgressBar in the layout instead."
+    },
+    {
+      "id": "networkinfo-to-networkcapabilities",
+      "kind": "API",
+      "match": [
+        "NetworkInfo",
+        "getActiveNetworkInfo"
+      ],
+      "deprecatedSince": "API 29",
+      "modern": "ConnectivityManager.getNetworkCapabilities / registerNetworkCallback",
+      "guidance": "NetworkInfo is deprecated. Query NetworkCapabilities, or observe connectivity with registerNetworkCallback."
+    },
+    {
+      "id": "vibrator-effect",
+      "kind": "API",
+      "match": [
+        "vibrate("
+      ],
+      "deprecatedSince": "API 26",
+      "modern": "Vibrator.vibrate(VibrationEffect.createOneShot(...))",
+      "guidance": "The raw-duration vibrate(long) overload is deprecated. Build a VibrationEffect instead."
+    },
+    {
+      "id": "apache-http-removed",
+      "kind": "DEPENDENCY",
+      "match": [
+        "org.apache.http",
+        "DefaultHttpClient",
+        "HttpGet",
+        "HttpPost"
+      ],
+      "deprecatedSince": "API 22, removed entirely in API 23",
+      "modern": "java.net.HttpURLConnection, OkHttp, or Retrofit",
+      "guidance": "The Apache HTTP client was removed from Android. Use HttpURLConnection for simple calls, or OkHttp/Retrofit."
+    },
+    {
+      "id": "boxed-primitive-constructors",
+      "kind": "API",
+      "match": [
+        "new Integer(",
+        "new Long(",
+        "new Double(",
+        "new Float(",
+        "new Boolean(",
+        "new Character(",
+        "new Short(",
+        "new Byte("
+      ],
+      "deprecatedSince": "Java 9",
+      "modern": "valueOf / Kotlin literals",
+      "guidance": "Boxed primitive constructors are deprecated for removal. In Kotlin just use the literal or .toInt()/.toLong() - never construct a boxed type explicitly."
+    },
+    {
+      "id": "class-newinstance",
+      "kind": "API",
+      "match": [
+        ".newInstance()"
+      ],
+      "deprecatedSince": "Java 9",
+      "modern": "getDeclaredConstructor().newInstance()",
+      "guidance": "Class.newInstance() is deprecated because it silently propagates checked exceptions. Use getDeclaredConstructor().newInstance()."
+    },
+    {
+      "id": "date-legacy-api",
+      "kind": "API",
+      "match": [
+        "new Date(",
+        "SimpleDateFormat",
+        "Calendar.getInstance()",
+        ".getYear()",
+        ".getMonth()"
+      ],
+      "deprecatedSince": "Java 8 introduced java.time; many java.util.Date methods are deprecated outright. java.time is native to Android from API 26.",
+      "modern": "java.time (LocalDate, LocalDateTime, Instant, DateTimeFormatter)",
+      "guidance": "Replace java.util.Date/Calendar/SimpleDateFormat with java.time (LocalDate, LocalDateTime, Instant, DateTimeFormatter). java.time is part of the platform from API 26, so at the target minimum SDK it is available directly - no desugaring, no ThreeTenABP, no fallback to the legacy types."
+    }
+  ]
+}

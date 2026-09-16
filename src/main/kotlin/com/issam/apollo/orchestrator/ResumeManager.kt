@@ -48,11 +48,19 @@ object ResumeManager {
     fun findLatestReportForProject(targetProjectPath: String, reportsDir: File = File("").absoluteFile.resolve("reports")): File? {
         if (!reportsDir.exists() || !reportsDir.isDirectory) return null
 
-        val reportFiles = reportsDir.listFiles { file ->
-            file.isFile && file.name.startsWith("migration-report-") && file.name.endsWith(".json")
-        }?.sortedByDescending { it.lastModified() } ?: return null
+        // State envelopes now live in reports/logs/. The root is still scanned so runs
+        // recorded before that move can still be resumed.
+        val candidateDirs = listOf(File(reportsDir, "logs"), reportsDir).filter { it.isDirectory }
+        val reportFiles = candidateDirs
+            .flatMap { dir ->
+                dir.listFiles { file ->
+                    file.isFile && file.name.startsWith("migration-report-") && file.name.endsWith(".json")
+                }?.toList().orEmpty()
+            }
+            .sortedByDescending { it.lastModified() }
 
         if (reportFiles.isEmpty()) return null
+
 
         val normalizedTarget = File(targetProjectPath).canonicalPath.replace('\\', '/').trimEnd('/')
         val targetDirName = File(targetProjectPath).name
@@ -432,7 +440,8 @@ object ResumeManager {
             reports = state.reports
         )
 
-        val reportFile = File(reportsDir, "migration-report-${System.currentTimeMillis()}.json")
+        val logsDir = File(reportsDir, "logs").apply { mkdirs() }
+        val reportFile = File(logsDir, "migration-report-${System.currentTimeMillis()}.json")
         reportFile.writeText(json.encodeToString(envelope))
 
         val summaryMarkdown = File(reportsDir, "migration-summary.md")
